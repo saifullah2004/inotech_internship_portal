@@ -481,20 +481,8 @@ export async function adminDecideRequest(userId: number, status: 'approved' | 'd
   }
 }
 
-export interface UpdateInternDetailsInput {
-  fullName: string;
-  fatherName: string;
-  phone: string;
-  address: string;
-  university: string;
-  department: string;
-  semester: string;
-  cgpa: string | number;
-  startDate: string | Date;
-}
-
 // Admin Action: Edit Intern details
-export async function adminUpdateInternDetails(userId: number, details: UpdateInternDetailsInput) {
+export async function adminUpdateInternDetails(userId: number, formData: FormData) {
   const sessionUser = await getSessionUser();
   if (!sessionUser || sessionUser.role !== 'admin') return { error: 'Unauthorized' };
 
@@ -505,19 +493,61 @@ export async function adminUpdateInternDetails(userId: number, details: UpdateIn
 
     if (!internDetail) return { error: 'Intern details not found' };
 
+    // Get text fields
+    const fullName = formData.get('fullName') as string;
+    const fatherName = formData.get('fatherName') as string;
+    const phone = formData.get('phone') as string;
+    const address = formData.get('address') as string;
+    const university = formData.get('university') as string;
+    const department = formData.get('department') as string;
+    const semester = formData.get('semester') as string;
+    const cgpa = formData.get('cgpa') as string;
+    const startDate = formData.get('startDate') as string;
+
+    // Build update data
+    const updateData: any = {
+      fullName,
+      fatherName,
+      phone,
+      address,
+      university,
+      department,
+      semester,
+      cgpa: parseFloat(cgpa),
+      startDate: new Date(startDate),
+    };
+
+    // Process file uploads
+    const uploadsDir = path.join(process.cwd(), 'public', 'uploads', String(userId));
+    await fs.mkdir(uploadsDir, { recursive: true });
+
+    const fileKeys = ['picture', 'cv', 'cnic', 'recommendationLetter', 'policeVerification'];
+    
+    for (const key of fileKeys) {
+      const file = formData.get(key) as File | null;
+      if (file && file.size > 0) {
+        // Save file
+        const buffer = Buffer.from(await file.arrayBuffer());
+        // Determine file extension
+        const ext = path.extname(file.name) || (key === 'cv' ? '.pdf' : '.png');
+        const fileName = `${key}${ext}`;
+        const filePath = path.join(uploadsDir, fileName);
+        await fs.writeFile(filePath, buffer);
+
+        // Map database field name
+        const dbFieldName = key === 'picture' ? 'picturePath'
+                          : key === 'cv' ? 'cvPath'
+                          : key === 'cnic' ? 'cnicPath'
+                          : key === 'recommendationLetter' ? 'recommendationLetterPath'
+                          : 'policeVerificationPath';
+
+        updateData[dbFieldName] = `/uploads/${userId}/${fileName}`;
+      }
+    }
+
     await db.internDetail.update({
       where: { userId },
-      data: {
-        fullName: details.fullName,
-        fatherName: details.fatherName,
-        phone: details.phone,
-        address: details.address,
-        university: details.university,
-        department: details.department,
-        semester: details.semester,
-        cgpa: typeof details.cgpa === 'number' ? details.cgpa : parseFloat(details.cgpa),
-        startDate: new Date(details.startDate),
-      },
+      data: updateData,
     });
 
     return { success: true };

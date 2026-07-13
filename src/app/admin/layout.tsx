@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { logoutUser } from '@/lib/actions/auth';
 import { useToast } from '@/components/providers/ToastProvider';
 import Logo from '@/components/ui/Logo';
-import ThemeToggle from '@/components/ui/ThemeToggle';
 import Button from '@/components/ui/Button';
 import { LayoutDashboard, Users, User, LogOut, Menu, X } from 'lucide-react';
 
@@ -116,8 +115,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
           
           <div className="flex items-center gap-4">
-            <ThemeToggle />
-            <div className="h-6 w-px bg-neutral-200 dark:bg-neutral-800" />
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-full bg-brand/10 flex items-center justify-center font-bold text-sm text-brand">
                 A

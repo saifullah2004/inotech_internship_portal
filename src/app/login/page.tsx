@@ -8,7 +8,6 @@ import { useToast } from '@/components/providers/ToastProvider';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import Logo from '@/components/ui/Logo';
-import ThemeToggle from '@/components/ui/ThemeToggle';
 import Modal from '@/components/ui/Modal';
 import { sendResetOtp, verifyResetOtp, resetPassword } from '@/lib/actions/reset';
 
@@ -148,9 +147,6 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 transition-colors">
-      <div className="absolute top-4 right-4">
-        <ThemeToggle />
-      </div>
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md flex flex-col items-center">
         <Logo className="mb-6" />

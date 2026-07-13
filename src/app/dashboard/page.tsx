@@ -10,14 +10,14 @@ import {
 } from '@/lib/actions/intern';
 import { logoutUser } from '@/lib/actions/auth';
 import { useToast } from '@/components/providers/ToastProvider';
-import ThemeToggle from '@/components/ui/ThemeToggle';
 import Logo from '@/components/ui/Logo';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
-import { Loader2, LogOut, CheckCircle2, AlertTriangle, FileText, Upload } from 'lucide-react';
+import { Loader2, LogOut, CheckCircle2, AlertTriangle, FileText, Upload, User, GraduationCap, Phone, MapPin, Calendar } from 'lucide-react';
 import { InternDetail } from '@prisma/client';
+import Modal from '@/components/ui/Modal';
 
 interface DashboardUser {
   id: number;
@@ -44,6 +44,26 @@ export default function UserDashboard() {
   
   // Missing document upload states
   const [uploadingDoc, setUploadingDoc] = useState<string | null>(null);
+
+  // Review Modal States
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [pendingFormData, setPendingFormData] = useState<FormData | null>(null);
+  const [reviewDetails, setReviewDetails] = useState<{
+    fullName: string;
+    fatherName: string;
+    phone: string;
+    address: string;
+    university: string;
+    department: string;
+    semester: string;
+    cgpa: string;
+    startDate: string;
+    pictureName: string;
+    cvName: string;
+    cnicName: string;
+    recommendationLetterName: string;
+    policeVerificationName: string;
+  } | null>(null);
 
   // Fetch state on mount
   const fetchStatus = useCallback(async (showToast = false) => {
@@ -189,8 +209,36 @@ export default function UserDashboard() {
       return;
     }
 
+    // Capture details for review
+    const capturedDetails = {
+      fullName: formData.get('fullName') as string,
+      fatherName: formData.get('fatherName') as string,
+      phone: formData.get('phone') as string,
+      address: formData.get('address') as string,
+      university: formData.get('university') as string,
+      department: formData.get('department') as string,
+      semester: formData.get('semester') as string,
+      cgpa: formData.get('cgpa') as string,
+      startDate: formData.get('startDate') as string,
+      pictureName: (formData.get('picture') as File | null)?.name || 'Not attached',
+      cvName: (formData.get('cv') as File | null)?.name || 'Not attached',
+      cnicName: (formData.get('cnic') as File | null)?.name || 'Not attached',
+      recommendationLetterName: (formData.get('recommendationLetter') as File | null)?.name || 'Not attached',
+      policeVerificationName: (formData.get('policeVerification') as File | null)?.name || 'Not attached',
+    };
+
+    setReviewDetails(capturedDetails);
+    setPendingFormData(formData);
+    setReviewModalOpen(true);
+  };
+
+  const confirmAndSubmit = () => {
+    if (!pendingFormData) return;
+    
+    setReviewModalOpen(false);
+    
     startTransition(async () => {
-      const res = await submitInternshipDetails(formData);
+      const res = await submitInternshipDetails(pendingFormData);
       if (res.error) {
         toast.error(res.error);
       } else {
@@ -250,7 +298,6 @@ export default function UserDashboard() {
               <span className="text-sm font-semibold text-neutral-800 dark:text-neutral-200">{user?.name}</span>
               <span className="text-xs text-neutral-400">Intern</span>
             </div>
-            <ThemeToggle />
             <Button
               variant="outline"
               size="sm"
@@ -719,6 +766,147 @@ export default function UserDashboard() {
           </div>
         )}
       </main>
+
+      {/* Review Application Modal */}
+      <Modal
+        isOpen={reviewModalOpen}
+        onClose={() => setReviewModalOpen(false)}
+        title="Review Your Registration"
+      >
+        {reviewDetails && (
+          <div className="space-y-6">
+
+            {/* Personal Details */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-brand pb-1 border-b border-neutral-100 dark:border-neutral-800 flex items-center gap-1.5">
+                <User className="w-3.5 h-3.5 text-brand" />
+                Personal Information
+              </h4>
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div>
+                  <span className="text-neutral-400 block">Full Name</span>
+                  <span className="font-semibold text-neutral-800 dark:text-neutral-250">{reviewDetails.fullName}</span>
+                </div>
+                <div>
+                  <span className="text-neutral-400 block">Father's Name</span>
+                  <span className="font-semibold text-neutral-800 dark:text-neutral-250">{reviewDetails.fatherName}</span>
+                </div>
+                <div>
+                  <span className="text-neutral-400 block">Phone Number</span>
+                  <span className="font-semibold text-neutral-800 dark:text-neutral-250">{reviewDetails.phone}</span>
+                </div>
+                <div>
+                  <span className="text-neutral-400 block">Email Address</span>
+                  <span className="font-semibold text-neutral-800 dark:text-neutral-250">{user?.email}</span>
+                </div>
+                <div className="col-span-2">
+                  <span className="text-neutral-400 block">Home Address</span>
+                  <span className="font-semibold text-neutral-800 dark:text-neutral-250">{reviewDetails.address}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Academic Details */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-brand pb-1 border-b border-neutral-100 dark:border-neutral-800 flex items-center gap-1.5">
+                <GraduationCap className="w-3.5 h-3.5 text-brand" />
+                Academic History
+              </h4>
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div>
+                  <span className="text-neutral-400 block">University</span>
+                  <span className="font-semibold text-neutral-800 dark:text-neutral-250">{reviewDetails.university}</span>
+                </div>
+                <div>
+                  <span className="text-neutral-400 block">Department</span>
+                  <span className="font-semibold text-neutral-800 dark:text-neutral-250">{reviewDetails.department}</span>
+                </div>
+                <div>
+                  <span className="text-neutral-400 block">Semester</span>
+                  <span className="font-semibold text-neutral-800 dark:text-neutral-250">{reviewDetails.semester}</span>
+                </div>
+                <div>
+                  <span className="text-neutral-400 block">CGPA</span>
+                  <span className="font-semibold text-neutral-800 dark:text-neutral-250">{reviewDetails.cgpa} / 4.00</span>
+                </div>
+                <div className="col-span-2">
+                  <span className="text-neutral-400 block">Starting Date</span>
+                  <span className="font-semibold text-neutral-800 dark:text-neutral-250">
+                    {new Date(reviewDetails.startDate).toLocaleDateString(undefined, {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Attached Documents */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-brand pb-1 border-b border-neutral-100 dark:border-neutral-800 flex items-center gap-1.5">
+                <FileText className="w-3.5 h-3.5 text-brand" />
+                Attached Documents
+              </h4>
+              <div className="space-y-1.5 text-xs">
+                <div className="flex justify-between items-center py-0.5">
+                  <span className="text-neutral-400">Profile Picture:</span>
+                  <span className="font-semibold text-neutral-700 dark:text-neutral-300 truncate max-w-[240px]" title={reviewDetails.pictureName}>
+                    {reviewDetails.pictureName}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center py-0.5">
+                  <span className="text-neutral-400">Curriculum Vitae (CV):</span>
+                  <span className="font-semibold text-neutral-700 dark:text-neutral-300 truncate max-w-[240px]" title={reviewDetails.cvName}>
+                    {reviewDetails.cvName}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center py-0.5">
+                  <span className="text-neutral-400">CNIC Copy:</span>
+                  <span className="font-semibold text-neutral-700 dark:text-neutral-300 truncate max-w-[240px]" title={reviewDetails.cnicName}>
+                    {reviewDetails.cnicName}
+                  </span>
+                </div>
+                {reviewDetails.recommendationLetterName !== 'Not attached' && (
+                  <div className="flex justify-between items-center py-0.5">
+                    <span className="text-neutral-400">Recommendation Letter:</span>
+                    <span className="font-semibold text-neutral-700 dark:text-neutral-300 truncate max-w-[240px]" title={reviewDetails.recommendationLetterName}>
+                      {reviewDetails.recommendationLetterName}
+                    </span>
+                  </div>
+                )}
+                {reviewDetails.policeVerificationName !== 'Not attached' && (
+                  <div className="flex justify-between items-center py-0.5">
+                    <span className="text-neutral-400">Police Verification:</span>
+                    <span className="font-semibold text-neutral-700 dark:text-neutral-300 truncate max-w-[240px]" title={reviewDetails.policeVerificationName}>
+                      {reviewDetails.policeVerificationName}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex justify-end gap-2 pt-4 border-t border-neutral-100 dark:border-neutral-850">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setReviewModalOpen(false)}
+              >
+                Update Details
+              </Button>
+              <Button
+                type="button"
+                onClick={confirmAndSubmit}
+                isLoading={isPending}
+                className="px-6"
+              >
+                Submit Application
+              </Button>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

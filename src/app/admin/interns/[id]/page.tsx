@@ -109,25 +109,36 @@ export default function InternDetailsPage({ params }: PageProps) {
     }
     if (!startDate) errors.startDate = 'Required';
 
+    // Document validation
+    const picture = formData.get('picture') as File | null;
+    const cv = formData.get('cv') as File | null;
+    const cnic = formData.get('cnic') as File | null;
+    const recLetter = formData.get('recommendationLetter') as File | null;
+    const policeCert = formData.get('policeVerification') as File | null;
+
+    if (picture && picture.size > 0 && !picture.type.startsWith('image/')) {
+      errors.picture = 'Must be an image file';
+    }
+    if (cv && cv.size > 0 && cv.type !== 'application/pdf') {
+      errors.cv = 'Must be a PDF document';
+    }
+    if (cnic && cnic.size > 0 && !cnic.type.startsWith('image/') && cnic.type !== 'application/pdf') {
+      errors.cnic = 'Must be an image or PDF document';
+    }
+    if (recLetter && recLetter.size > 0 && !recLetter.type.startsWith('image/') && recLetter.type !== 'application/pdf') {
+      errors.recommendationLetter = 'Must be an image or PDF document';
+    }
+    if (policeCert && policeCert.size > 0 && !policeCert.type.startsWith('image/') && policeCert.type !== 'application/pdf') {
+      errors.policeVerification = 'Must be an image or PDF document';
+    }
+
     if (Object.keys(errors).length > 0) {
       setEditErrors(errors);
       return;
     }
 
     startEditTransition(async () => {
-      const payload = {
-        fullName,
-        fatherName,
-        phone,
-        address,
-        university,
-        department,
-        semester,
-        cgpa,
-        startDate,
-      };
-
-      const res = await adminUpdateInternDetails(internId, payload);
+      const res = await adminUpdateInternDetails(internId, formData);
       if (res.error) {
         toast.error(res.error);
       } else {
@@ -544,6 +555,93 @@ export default function InternDetailsPage({ params }: PageProps) {
               error={editErrors.startDate}
               required
             />
+
+            {/* Documents Section */}
+            <div className="border-t border-neutral-100 dark:border-neutral-800 pt-4 space-y-4">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">
+                Update Documents (Optional)
+              </h4>
+              
+              {/* Profile Picture */}
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-semibold text-neutral-600 dark:text-neutral-300">
+                  Profile Picture {details.picturePath && <span className="text-[10px] text-emerald-500 font-normal">(Uploaded)</span>}
+                </label>
+                <input
+                  type="file"
+                  name="picture"
+                  accept="image/*"
+                  className="w-full px-3 py-1.5 border rounded-lg border-neutral-200 dark:border-neutral-800 text-xs bg-white dark:bg-neutral-900 focus:outline-none file:mr-2 file:py-0.5 file:px-2 file:rounded file:border-0 file:bg-neutral-100 dark:file:bg-neutral-800 file:text-[10px] file:font-semibold cursor-pointer"
+                />
+                {editErrors.picture && (
+                  <p className="text-[10px] text-rose-500 font-medium">{editErrors.picture}</p>
+                )}
+              </div>
+
+              {/* CV */}
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-semibold text-neutral-600 dark:text-neutral-300">
+                  CV Document {details.cvPath && <span className="text-[10px] text-emerald-500 font-normal">(Uploaded)</span>}
+                </label>
+                <input
+                  type="file"
+                  name="cv"
+                  accept="application/pdf"
+                  className="w-full px-3 py-1.5 border rounded-lg border-neutral-200 dark:border-neutral-800 text-xs bg-white dark:bg-neutral-900 focus:outline-none file:mr-2 file:py-0.5 file:px-2 file:rounded file:border-0 file:bg-neutral-100 dark:file:bg-neutral-800 file:text-[10px] file:font-semibold cursor-pointer"
+                />
+                {editErrors.cv && (
+                  <p className="text-[10px] text-rose-500 font-medium">{editErrors.cv}</p>
+                )}
+              </div>
+
+              {/* CNIC */}
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-semibold text-neutral-600 dark:text-neutral-300">
+                  CNIC Copy {details.cnicPath && <span className="text-[10px] text-emerald-500 font-normal">(Uploaded)</span>}
+                </label>
+                <input
+                  type="file"
+                  name="cnic"
+                  accept="image/*,application/pdf"
+                  className="w-full px-3 py-1.5 border rounded-lg border-neutral-200 dark:border-neutral-800 text-xs bg-white dark:bg-neutral-900 focus:outline-none file:mr-2 file:py-0.5 file:px-2 file:rounded file:border-0 file:bg-neutral-100 dark:file:bg-neutral-800 file:text-[10px] file:font-semibold cursor-pointer"
+                />
+                {editErrors.cnic && (
+                  <p className="text-[10px] text-rose-500 font-medium">{editErrors.cnic}</p>
+                )}
+              </div>
+
+              {/* Recommendation Letter */}
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-semibold text-neutral-600 dark:text-neutral-300">
+                  Recommendation Letter {details.recommendationLetterPath && <span className="text-[10px] text-emerald-500 font-normal">(Uploaded)</span>}
+                </label>
+                <input
+                  type="file"
+                  name="recommendationLetter"
+                  accept="image/*,application/pdf"
+                  className="w-full px-3 py-1.5 border rounded-lg border-neutral-200 dark:border-neutral-800 text-xs bg-white dark:bg-neutral-900 focus:outline-none file:mr-2 file:py-0.5 file:px-2 file:rounded file:border-0 file:bg-neutral-100 dark:file:bg-neutral-800 file:text-[10px] file:font-semibold cursor-pointer"
+                />
+                {editErrors.recommendationLetter && (
+                  <p className="text-[10px] text-rose-500 font-medium">{editErrors.recommendationLetter}</p>
+                )}
+              </div>
+
+              {/* Police Verification */}
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-semibold text-neutral-600 dark:text-neutral-300">
+                  Police Verification Certificate {details.policeVerificationPath && <span className="text-[10px] text-emerald-500 font-normal">(Uploaded)</span>}
+                </label>
+                <input
+                  type="file"
+                  name="policeVerification"
+                  accept="image/*,application/pdf"
+                  className="w-full px-3 py-1.5 border rounded-lg border-neutral-200 dark:border-neutral-800 text-xs bg-white dark:bg-neutral-900 focus:outline-none file:mr-2 file:py-0.5 file:px-2 file:rounded file:border-0 file:bg-neutral-100 dark:file:bg-neutral-800 file:text-[10px] file:font-semibold cursor-pointer"
+                />
+                {editErrors.policeVerification && (
+                  <p className="text-[10px] text-rose-500 font-medium">{editErrors.policeVerification}</p>
+                )}
+              </div>
+            </div>
 
             <div className="flex justify-end gap-2 pt-4">
               <Button
