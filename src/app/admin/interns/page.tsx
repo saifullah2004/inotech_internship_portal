@@ -7,7 +7,7 @@ import { useToast } from '@/components/providers/ToastProvider';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
-import { Loader2, Search, FileWarning, Eye, UserPlus, CheckCircle, XCircle } from 'lucide-react';
+import { Loader2, Search, FileWarning, Eye, UserPlus, CheckCircle, XCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface AdminInternListItem {
   id: number;
@@ -51,8 +51,17 @@ export default function InternsListPage() {
   
   // Search & Filter state
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'pending_approval', 'approved', 'declined', 'submitted'
+  const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'pending_approval', 'declined', 'submitted'
   const [missingDocsOnly, setMissingDocsOnly] = useState(false); // filter interns missing recommendationLetter/policeVerification
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  // Reset page when filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter, missingDocsOnly]);
 
   useEffect(() => {
     const loadInterns = async () => {
@@ -88,6 +97,15 @@ export default function InternsListPage() {
     return matchesSearch && matchesStatus && matchesMissingDocs;
   });
 
+  // Calculate Pagination Variables
+  const totalItems = filteredInterns.length;
+  const totalPages = Math.ceil(totalItems / pageSize) || 1;
+  const activePage = Math.min(currentPage, totalPages);
+  
+  const startIndex = (activePage - 1) * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, totalItems);
+  const paginatedInterns = filteredInterns.slice(startIndex, startIndex + pageSize);
+
   if (loading) {
     return (
       <div className="h-64 flex flex-col items-center justify-center">
@@ -100,7 +118,6 @@ export default function InternsListPage() {
   const tabFilters = [
     { key: 'all', label: 'All Candidates' },
     { key: 'pending_approval', label: 'Pending Requests' },
-    { key: 'approved', label: 'Approved Users' },
     { key: 'declined', label: 'Declined' },
     { key: 'submitted', label: 'Active Interns' },
   ];
@@ -186,8 +203,8 @@ export default function InternsListPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
-            {filteredInterns.length > 0 ? (
-              filteredInterns.map((intern) => (
+            {paginatedInterns.length > 0 ? (
+              paginatedInterns.map((intern) => (
                 <tr
                   key={intern.id}
                   className="hover:bg-neutral-50/50 dark:hover:bg-neutral-900/30 transition-colors"
@@ -226,7 +243,7 @@ export default function InternsListPage() {
                         </div>
                       ) : (
                         <span className="text-xs text-emerald-600 dark:text-emerald-500 font-semibold">
-                          None (Completed)
+                          Completed
                         </span>
                       )
                     ) : (
@@ -278,6 +295,74 @@ export default function InternsListPage() {
             )}
           </tbody>
         </table>
+
+        {/* Pagination Controls */}
+        {totalItems > 0 && (
+          <div className="px-6 py-4 border-t border-neutral-100 dark:border-neutral-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-500">
+            {/* Page Size Adjuster with + and - */}
+            <div className="flex items-center gap-2">
+              <span>Show limit:</span>
+              <div className="flex items-center gap-1 bg-neutral-50 dark:bg-neutral-900 border border-neutral-250 dark:border-neutral-800 rounded-lg p-0.5">
+                <button
+                  type="button"
+                  disabled={pageSize <= 5}
+                  onClick={() => setPageSize(Math.max(5, pageSize - 5))}
+                  className="p-1 rounded-md hover:bg-neutral-200 dark:hover:bg-neutral-800 disabled:opacity-30 cursor-pointer font-bold w-6 h-6 flex items-center justify-center text-sm"
+                  title="Show less"
+                >
+                  -
+                </button>
+                <span className="font-semibold px-2 min-w-8 text-center text-neutral-800 dark:text-neutral-250">
+                  {pageSize}
+                </span>
+                <button
+                  type="button"
+                  disabled={pageSize >= 50}
+                  onClick={() => setPageSize(Math.min(50, pageSize + 5))}
+                  className="p-1 rounded-md hover:bg-neutral-200 dark:hover:bg-neutral-800 disabled:opacity-30 cursor-pointer font-bold w-6 h-6 flex items-center justify-center text-sm"
+                  title="Show more"
+                >
+                  +
+                </button>
+              </div>
+              <span className="text-neutral-450">per page</span>
+            </div>
+
+            {/* Showing details */}
+            <div>
+              Showing <span className="font-semibold text-neutral-700 dark:text-neutral-350">{startIndex + 1}</span> to{' '}
+              <span className="font-semibold text-neutral-700 dark:text-neutral-350">{endIndex}</span> of{' '}
+              <span className="font-semibold text-neutral-700 dark:text-neutral-350">{totalItems}</span> interns
+            </div>
+
+            {/* Pagination buttons */}
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={activePage === 1}
+                onClick={() => setCurrentPage(activePage - 1)}
+                className="flex items-center gap-1 py-1 px-2.5 cursor-pointer text-xs"
+              >
+                <ChevronLeft className="w-3.5 h-3.5" />
+                Previous
+              </Button>
+              <div className="font-medium text-neutral-700 dark:text-neutral-350">
+                Page {activePage} of {totalPages}
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={activePage === totalPages}
+                onClick={() => setCurrentPage(activePage + 1)}
+                className="flex items-center gap-1 py-1 px-2.5 cursor-pointer text-xs"
+              >
+                Next
+                <ChevronRight className="w-3.5 h-3.5" />
+              </Button>
+            </div>
+          </div>
+        )}
       </Card>
     </div>
   );
