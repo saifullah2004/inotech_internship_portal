@@ -1,0 +1,65 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                Int            @id @default(autoincrement())
+  name              String
+  email             String         @unique
+  passwordHash      String         @map("password_hash")
+  role              String         @default("user") // "user" | "admin"
+  applicationStatus String         @default("not_submitted") @map("application_status") // "not_submitted" | "pending_approval" | "approved" | "declined" | "submitted"
+  createdAt         DateTime       @default(now()) @map("created_at")
+  resetOtp          String?        @map("reset_otp")
+  resetOtpExpires   DateTime?      @map("reset_otp_expires")
+
+  internRequests    InternRequest[]
+  internDetails     InternDetail?
+
+  @@index([email])
+  @@map("users")
+}
+
+model InternRequest {
+  id          Int       @id @default(autoincrement())
+  userId      Int       @map("user_id")
+  status      String    // "pending" | "approved" | "declined"
+  requestedAt DateTime  @default(now()) @map("requested_at")
+  decidedAt   DateTime? @map("decided_at")
+  decidedBy   Int?      @map("decided_by")
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@map("intern_requests")
+}
+
+model InternDetail {
+  id                        Int      @id @default(autoincrement())
+  userId                    Int      @unique @map("user_id")
+  fullName                  String   @map("full_name")
+  fatherName                String   @map("father_name")
+  phone                     String
+  address                   String   @db.Text
+  university                String
+  department                String
+  semester                  String
+  cgpa                      Float
+  startDate                 DateTime @map("start_date")
+  picturePath               String   @map("picture_path")
+  cvPath                    String   @map("cv_path")
+  cnicPath                  String   @map("cnic_path")
+  recommendationLetterPath  String?  @map("recommendation_letter_path")
+  policeVerificationPath    String?  @map("police_verification_path")
+  termsAccepted             Boolean  @map("terms_accepted")
+  submittedAt               DateTime @default(now()) @map("submitted_at")
+
+  user                      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("intern_details")
+}

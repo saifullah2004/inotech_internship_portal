@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 450 120" width="100%" height="100%">
+  <!-- Gold/Mustard rectangle outline -->
+  <rect x="10" y="10" width="80" height="100" rx="2" fill="none" stroke="#E5A93B" stroke-width="8" />
+  <!-- Stylized italic 'i' body -->
+  <path d="M 38 88 C 35 88, 33 86, 34 82 C 37 72, 45 54, 53 43 C 55 40, 58 39, 60 40 C 62 41, 62 44, 60 49 C 52 65, 45 80, 41 85 C 40 87, 39 88, 38 88 Z" fill="#000000" />
+  <!-- Stylized italic 'i' dot (oval) -->
+  <ellipse cx="61" cy="26" rx="7" ry="4.5" transform="rotate(-15 61 26)" fill="#000000" />
+  
+  <!-- Text group -->
+  <text x="110" y="58" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="46" fill="#E26321" letter-spacing="1">INOTECH</text>
+  <text x="112" y="94" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="24" fill="#000000">Solutions (Pvt) Ltd</text>
+</svg>
