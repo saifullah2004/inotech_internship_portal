@@ -16,13 +16,13 @@ export default function Logo({
   className = '',
   href,
 }: LogoProps) {
-  const defaultWidth = iconOnly ? 40 : 180;
+  const defaultWidth = iconOnly ? 40 : 134;
   const defaultHeight = iconOnly ? 48 : 48;
-  const src = iconOnly ? '/icon.svg' : '/logo.svg';
+  const src = iconOnly ? '/icon.svg' : '/logo.png';
   const alt = iconOnly ? 'Inotech Logo Icon' : 'Inotech Solutions Logo';
 
   const content = (
-    <div className={`relative flex items-center justify-center ${className}`}>
+    <div className={`relative flex items-center justify-center dark:bg-white/95 dark:rounded-lg dark:px-3 dark:py-1.5 ${className}`}>
       <Image
         src={src}
         alt={alt}
