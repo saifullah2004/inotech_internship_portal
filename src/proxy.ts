@@ -14,10 +14,10 @@ export async function proxy(request: NextRequest) {
 
   if (!sessionCookie) {
     // User is NOT logged in
-    if (isAuthPage) {
+    if (isAuthPage || isRootPage) {
       return NextResponse.next();
     }
-    // Redirect to login for protected pages or root
+    // Redirect to login for protected pages
     return NextResponse.redirect(new URL('/login', request.url));
   }
 

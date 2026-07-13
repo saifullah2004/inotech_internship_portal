@@ -38,7 +38,7 @@ export async function sendOtpEmail(toEmail: string, otp: string, userName: strin
         </div>
         
         <div style="margin-top: 32px; border-top: 1px solid #f5f5f5; padding-top: 16px; text-align: center;">
-          <p style="font-size: 11px; color: #a1a1aa; margin: 0;">&copy; 2026 Inotech Solutions (Pvt) Ltd. All rights reserved.</p>
+          <p style="font-size: 11px; color: #a1a1aa; margin: 0;">&copy; 2020 Inotech Solutions (Pvt) Ltd. All rights reserved.</p>
         </div>
       </div>
     `,
