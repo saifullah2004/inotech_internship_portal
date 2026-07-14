@@ -287,7 +287,7 @@ export default function RootPage() {
               Empowering organization growth through premium software systems and expert professional development programs.
             </p>
           </div>
-          <div className="space-y-2 text-sm text-slate-300 font-light">
+          <div className="space-y-2 text-sm text-slate-300 font-light md:justify-self-center">
             <p className="font-semibold text-white">Contact Information</p>
             <p>Email: <a href="mailto:info@inotechsoln.com" className="hover:text-brand hover:underline">info@inotechsoln.com</a></p>
             <p>Phone: 051-8778995</p>
