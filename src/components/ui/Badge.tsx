@@ -11,9 +11,9 @@ export default function Badge({ status, className = '' }: BadgeProps) {
   let styles = 'bg-neutral-100 text-neutral-800 dark:bg-neutral-800 dark:text-neutral-300';
   let label = status;
 
-  if (normalizedStatus === 'approved' || normalizedStatus === 'accepted' || normalizedStatus === 'success') {
+  if (normalizedStatus === 'approved' || normalizedStatus === 'accepted' || normalizedStatus === 'success' || normalizedStatus === 'active') {
     styles = 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/30';
-    label = normalizedStatus === 'approved' ? 'Approved' : normalizedStatus === 'accepted' ? 'Accepted' : 'Success';
+    label = normalizedStatus === 'approved' ? 'Approved' : normalizedStatus === 'accepted' ? 'Accepted' : normalizedStatus === 'active' ? 'Active' : 'Success';
   } else if (normalizedStatus === 'declined' || normalizedStatus === 'rejected' || normalizedStatus === 'error') {
     styles = 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/30 dark:text-rose-400 dark:border-rose-900/30';
     label = normalizedStatus === 'declined' ? 'Declined' : normalizedStatus === 'rejected' ? 'Rejected' : 'Error';
@@ -26,6 +26,9 @@ export default function Badge({ status, className = '' }: BadgeProps) {
   } else if (normalizedStatus === 'submitted') {
     styles = 'bg-brand/5 text-brand border-brand/20 dark:bg-brand/10 dark:text-brand-light dark:border-brand/10';
     label = 'Submitted';
+  } else if (normalizedStatus === 'completed') {
+    styles = 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-900/30';
+    label = 'Completed';
   }
 
   return (

@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useTransition, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { adminGetInternById, adminDecideRequest, adminUpdateInternDetails } from '@/lib/actions/intern';
+import { adminGetSessions } from '@/lib/actions/session';
 import { useToast } from '@/components/providers/ToastProvider';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
@@ -41,13 +42,29 @@ export default function InternDetailsPage({ params }: PageProps) {
 
   // States
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<(PrismaUser & { internDetails: InternDetail | null; internRequests: InternRequest[] }) | null>(null);
+  const [user, setUser] = useState<(PrismaUser & { 
+    internDetails: InternDetail | null; 
+    internRequests: InternRequest[];
+    session?: { id: number; sessionName: string; status: string } | null;
+  }) | null>(null);
   const [details, setDetails] = useState<InternDetail | null>(null);
+  const [sessions, setSessions] = useState<{ id: number; sessionName: string }[]>([]);
 
   // Edit Modal States
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editErrors, setEditErrors] = useState<Record<string, string>>({});
   const [editPending, startEditTransition] = useTransition();
+
+  // Load sessions on mount
+  useEffect(() => {
+    const loadSessions = async () => {
+      const res = await adminGetSessions();
+      if (res.success && res.sessions) {
+        setSessions(res.sessions);
+      }
+    };
+    loadSessions();
+  }, []);
 
   const loadInternData = useCallback(async () => {
     const res = await adminGetInternById(internId);
@@ -55,7 +72,7 @@ export default function InternDetailsPage({ params }: PageProps) {
       toast.error(res.error);
       router.push('/admin/interns');
     } else if (res.intern) {
-      setUser(res.intern);
+      setUser(res.intern as any);
       setDetails(res.intern.internDetails);
     }
     setLoading(false);
@@ -266,7 +283,7 @@ export default function InternDetailsPage({ params }: PageProps) {
                     Edit Details
                   </Button>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-sm">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5 text-sm">
                   <div>
                     <span className="text-neutral-400 block">Father&apos;s Name</span>
                     <span className="font-semibold text-neutral-800 dark:text-neutral-200">
@@ -282,7 +299,13 @@ export default function InternDetailsPage({ params }: PageProps) {
                       {details.phone}
                     </span>
                   </div>
-                  <div className="md:col-span-2">
+                  <div>
+                    <span className="text-neutral-400 block">Assigned Session</span>
+                    <span className="font-semibold text-brand block mt-0.5">
+                      {user.session ? user.session.sessionName : <span className="text-neutral-450 italic font-normal">None Assigned</span>}
+                    </span>
+                  </div>
+                  <div className="md:col-span-3">
                     <span className="text-neutral-400 block flex items-center gap-1">
                       <MapPin className="w-3.5 h-3.5" />
                       Address
@@ -555,6 +578,26 @@ export default function InternDetailsPage({ params }: PageProps) {
               error={editErrors.startDate}
               required
             />
+
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="sessionId" className="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+                Assigned Session *
+              </label>
+              <select
+                id="sessionId"
+                name="sessionId"
+                defaultValue={user.sessionId || ''}
+                required
+                className="w-full px-3.5 py-2.5 rounded-lg border text-sm bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand cursor-pointer"
+              >
+                <option value="" disabled>Select Internship Session</option>
+                {sessions.map((s) => (
+                  <option key={s.id} value={String(s.id)}>
+                    {s.sessionName}
+                  </option>
+                ))}
+              </select>
+            </div>
 
             {/* Documents Section */}
             <div className="border-t border-neutral-100 dark:border-neutral-800 pt-4 space-y-4">

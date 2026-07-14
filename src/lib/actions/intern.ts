@@ -26,6 +26,7 @@ export async function checkUserStatus() {
       where: { id: sessionUser.userId },
       include: {
         internDetails: true,
+        session: true,
         internRequests: {
           orderBy: { requestedAt: 'desc' },
           take: 1,
@@ -64,6 +65,15 @@ export async function checkUserStatus() {
         applicationStatus: user.applicationStatus,
       },
       internDetails: user.internDetails,
+      session: user.session ? {
+        id: user.session.id,
+        sessionName: user.session.sessionName,
+        sessionCode: user.session.sessionCode,
+        description: user.session.description,
+        startDate: user.session.startDate.toISOString(),
+        endDate: user.session.endDate.toISOString(),
+        status: user.session.status,
+      } : null,
       latestRequest: user.internRequests[0] || null,
     };
   } catch (error) {
@@ -353,16 +363,60 @@ export async function uploadMissingDocument(formData: FormData) {
    ========================================== */
 
 // Admin Action: Fetch Summary Stats
-export async function adminGetDashboardStats() {
+export async function adminGetDashboardStats(selectedSessionId?: number) {
   const sessionUser = await getSessionUser();
   if (!sessionUser || sessionUser.role !== 'admin') return { error: 'Unauthorized' };
 
   try {
-    const [totalUsers, totalInterns, pendingRequests] = await Promise.all([
-      db.user.count({ where: { role: 'user' } }),
-      db.user.count({ where: { applicationStatus: 'submitted' } }),
-      db.user.count({ where: { applicationStatus: 'pending_approval' } }),
+    const sessionWhereClause = selectedSessionId ? { sessionId: selectedSessionId } : {};
+
+    const [
+      totalUsers,
+      totalInterns,
+      pendingRequests,
+      totalSessions,
+      completedSessions,
+      activeSession,
+    ] = await Promise.all([
+      db.user.count({
+        where: {
+          role: 'user',
+          ...sessionWhereClause,
+        },
+      }),
+      db.user.count({
+        where: {
+          role: 'user',
+          applicationStatus: 'submitted',
+          ...sessionWhereClause,
+        },
+      }),
+      db.user.count({
+        where: {
+          role: 'user',
+          applicationStatus: 'pending_approval',
+          ...sessionWhereClause,
+        },
+      }),
+      db.internshipSession.count(),
+      db.internshipSession.count({
+        where: { status: 'Completed' },
+      }),
+      db.internshipSession.findFirst({
+        where: { status: 'Active' },
+        orderBy: { createdAt: 'desc' },
+      }),
     ]);
+
+    let activeSessionInternsCount = 0;
+    if (activeSession) {
+      activeSessionInternsCount = await db.user.count({
+        where: {
+          role: 'user',
+          sessionId: activeSession.id,
+        },
+      });
+    }
 
     return {
       success: true,
@@ -370,6 +424,10 @@ export async function adminGetDashboardStats() {
         totalUsers,
         totalInterns,
         pendingRequests,
+        totalSessions,
+        completedSessions,
+        activeSessionName: activeSession ? activeSession.sessionName : 'None',
+        activeSessionInternsCount,
       },
     };
   } catch (error) {
@@ -388,6 +446,7 @@ export async function adminGetInterns() {
       where: { role: 'user' },
       include: {
         internDetails: true,
+        session: true,
         internRequests: {
           orderBy: { requestedAt: 'desc' },
           take: 1,
@@ -413,6 +472,8 @@ export async function adminGetInterns() {
           createdAt: user.createdAt.toISOString(),
           university: user.internDetails?.university || null,
           department: user.internDetails?.department || null,
+          sessionId: user.sessionId,
+          sessionName: user.session?.sessionName || null,
           missingDocs,
           latestRequest: user.internRequests[0] || null,
         };
@@ -503,6 +564,8 @@ export async function adminUpdateInternDetails(userId: number, formData: FormDat
     const semester = formData.get('semester') as string;
     const cgpa = formData.get('cgpa') as string;
     const startDate = formData.get('startDate') as string;
+    const sessionIdStr = formData.get('sessionId') as string;
+    const sessionId = sessionIdStr ? parseInt(sessionIdStr) : null;
 
     // Build update data
     const updateData: {
@@ -560,10 +623,18 @@ export async function adminUpdateInternDetails(userId: number, formData: FormDat
       }
     }
 
-    await db.internDetail.update({
-      where: { userId },
-      data: updateData,
-    });
+    await db.$transaction([
+      db.internDetail.update({
+        where: { userId },
+        data: updateData,
+      }),
+      db.user.update({
+        where: { id: userId },
+        data: {
+          sessionId,
+        },
+      }),
+    ]);
 
     return { success: true };
   } catch (error) {
@@ -588,6 +659,12 @@ export async function adminCreateInternManually(formData: FormData) {
     const semester = formData.get('semester') as string;
     const cgpa = formData.get('cgpa') as string;
     const startDate = formData.get('startDate') as string;
+    const sessionIdStr = formData.get('sessionId') as string;
+
+    if (!sessionIdStr) {
+      return { error: 'Session assignment is required' };
+    }
+    const sessionId = parseInt(sessionIdStr);
 
     // Check if email already registered
     const existingUser = await db.user.findUnique({
@@ -650,6 +727,7 @@ export async function adminCreateInternManually(formData: FormData) {
         passwordHash,
         role: 'user',
         applicationStatus: 'submitted', // Mark already submitted
+        sessionId,
       },
     });
 
@@ -771,6 +849,7 @@ export async function adminGetInternById(id: number) {
       where: { id },
       include: {
         internDetails: true,
+        session: true,
         internRequests: {
           orderBy: { requestedAt: 'desc' },
         },

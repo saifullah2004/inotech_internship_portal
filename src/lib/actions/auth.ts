@@ -30,6 +30,12 @@ export async function registerUser(prevState: unknown, formData: FormData) {
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
 
+    // Find latest active session
+    const latestSession = await db.internshipSession.findFirst({
+      where: { status: 'Active' },
+      orderBy: { createdAt: 'desc' },
+    });
+
     // Create user
     const user = await db.user.create({
       data: {
@@ -38,6 +44,7 @@ export async function registerUser(prevState: unknown, formData: FormData) {
         passwordHash,
         role: 'user',
         applicationStatus: 'not_submitted',
+        sessionId: latestSession ? latestSession.id : null,
       },
     });
 

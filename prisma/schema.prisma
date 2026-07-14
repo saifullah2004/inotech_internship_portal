@@ -17,9 +17,11 @@ model User {
   createdAt         DateTime       @default(now()) @map("created_at")
   resetOtp          String?        @map("reset_otp")
   resetOtpExpires   DateTime?      @map("reset_otp_expires")
+  sessionId         Int?           @map("session_id")
 
   internRequests    InternRequest[]
   internDetails     InternDetail?
+  session           InternshipSession? @relation(fields: [sessionId], references: [id], onDelete: Restrict)
 
   @@index([email])
   @@map("users")
@@ -63,3 +65,20 @@ model InternDetail {
 
   @@map("intern_details")
 }
+
+model InternshipSession {
+  id          Int      @id @default(autoincrement())
+  sessionName String   @map("session_name")
+  sessionCode String?  @map("session_code")
+  description String?  @db.Text
+  startDate   DateTime @map("start_date")
+  endDate     DateTime @map("end_date")
+  status      String   @default("Active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  users       User[]
+
+  @@map("internship_sessions")
+}
+

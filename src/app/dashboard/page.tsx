@@ -15,7 +15,7 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
-import { Loader2, LogOut, CheckCircle2, AlertTriangle, FileText, Upload, User, GraduationCap } from 'lucide-react';
+import { Loader2, LogOut, CheckCircle2, AlertTriangle, FileText, Upload, User, GraduationCap, Calendar } from 'lucide-react';
 import { InternDetail } from '@prisma/client';
 import Modal from '@/components/ui/Modal';
 
@@ -65,6 +65,16 @@ export default function UserDashboard() {
     policeVerificationName: string;
   } | null>(null);
 
+  const [session, setSession] = useState<{
+    id: number;
+    sessionName: string;
+    sessionCode: string | null;
+    description: string | null;
+    startDate: string;
+    endDate: string;
+    status: string;
+  } | null>(null);
+
   // Fetch state on mount
   const fetchStatus = useCallback(async (showToast = false) => {
     const res = await checkUserStatus();
@@ -75,6 +85,7 @@ export default function UserDashboard() {
     
     setUser(res.user as DashboardUser | null);
     setDetails(res.internDetails as InternDetail | null);
+    setSession(res.session as any);
 
     if (showToast) {
       toast.success('Status synchronized');
@@ -93,22 +104,25 @@ export default function UserDashboard() {
     fetchStatus().then(() => setLoading(false));
   }, [fetchStatus]);
 
-  // Poll status when in pending_approval
+  // Poll status when user is logged in
   useEffect(() => {
-    if (user?.applicationStatus !== 'pending_approval') return;
+    if (!user) return;
 
     const interval = setInterval(() => {
       checkUserStatus().then((res) => {
-        if (res.user && res.user.applicationStatus !== 'pending_approval') {
+        if (res.success && res.user) {
+          if (res.user.applicationStatus !== user.applicationStatus) {
+            toast.info(`Application status updated: ${res.user.applicationStatus}`);
+          }
           setUser(res.user as DashboardUser | null);
-          setDetails(res.internDetails);
-          toast.info(`Application status updated: ${res.user.applicationStatus}`);
+          setDetails(res.internDetails as InternDetail | null);
+          setSession(res.session as any);
         }
       });
-    }, 6000); // Check every 6 seconds
+    }, 8000); // Check every 8 seconds
 
     return () => clearInterval(interval);
-  }, [user?.applicationStatus, toast]);
+  }, [user?.id, user?.applicationStatus, toast]);
 
   // Handle auto logout and redirect when declined
   useEffect(() => {
@@ -314,6 +328,60 @@ export default function UserDashboard() {
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-4xl w-full mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        
+        {/* Internship Session Information Card */}
+        {session && (user?.applicationStatus === 'submitted' || user?.applicationStatus === 'approved') && (
+          <Card className="mb-6 p-6 border border-brand/10 bg-brand/5 dark:bg-brand/10/30">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-brand/10 dark:bg-brand/20 text-brand rounded-xl">
+                  <Calendar className="w-6 h-6" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-450 block">
+                    Internship Session
+                  </span>
+                  <h3 className="text-lg font-bold text-neutral-800 dark:text-neutral-100 mt-0.5">
+                    {session.sessionName}
+                  </h3>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-sm">
+                <div>
+                  <span className="text-neutral-405 block uppercase tracking-wider font-bold text-[9px]">
+                    Start Date
+                  </span>
+                  <span className="font-semibold text-neutral-700 dark:text-neutral-350">
+                    {new Date(session.startDate).toLocaleDateString(undefined, {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
+                    })}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-neutral-405 block uppercase tracking-wider font-bold text-[9px]">
+                    End Date
+                  </span>
+                  <span className="font-semibold text-neutral-700 dark:text-neutral-350">
+                    {new Date(session.endDate).toLocaleDateString(undefined, {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
+                    })}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-neutral-405 block uppercase tracking-wider font-bold text-[9px] mb-0.5">
+                    Status
+                  </span>
+                  <Badge status={session.status} className="mt-0.5" />
+                </div>
+              </div>
+            </div>
+          </Card>
+        )}
         
         {/* STATE 1: PENDING APPROVAL */}
         {user?.applicationStatus === 'pending_approval' && (

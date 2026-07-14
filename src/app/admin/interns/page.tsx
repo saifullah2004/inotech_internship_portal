@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { adminGetInterns, adminDecideRequest } from '@/lib/actions/intern';
+import { adminGetSessions } from '@/lib/actions/session';
 import { useToast } from '@/components/providers/ToastProvider';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
@@ -17,6 +18,8 @@ interface AdminInternListItem {
   createdAt: string;
   university: string | null;
   department: string | null;
+  sessionId?: number | null;
+  sessionName?: string | null;
   missingDocs: string[];
   latestRequest: {
     id: number;
@@ -32,6 +35,8 @@ export default function InternsListPage() {
   const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [interns, setInterns] = useState<AdminInternListItem[]>([]);
+  const [sessions, setSessions] = useState<{ id: number; sessionName: string }[]>([]);
+  const [selectedSessionId, setSelectedSessionId] = useState<string>('all');
   const [decisionPendingId, setDecisionPendingId] = useState<number | null>(null);
 
   const handleDecision = async (internId: number, decision: 'approved' | 'declined') => {
@@ -44,7 +49,7 @@ export default function InternsListPage() {
       toast.success(`Intern request successfully ${decision === 'approved' ? 'approved' : 'declined'}!`);
       const updatedList = await adminGetInterns();
       if (updatedList.interns) {
-        setInterns(updatedList.interns);
+        setInterns(updatedList.interns as AdminInternListItem[]);
       }
     }
   };
@@ -61,7 +66,23 @@ export default function InternsListPage() {
   // Reset page when filter changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, statusFilter, missingDocsOnly]);
+  }, [searchTerm, statusFilter, missingDocsOnly, selectedSessionId]);
+
+  // Load saved session filter and sessions
+  useEffect(() => {
+    const saved = localStorage.getItem('inotech_session_filter');
+    if (saved) {
+      setSelectedSessionId(saved);
+    }
+
+    const loadSessions = async () => {
+      const res = await adminGetSessions();
+      if (res.success && res.sessions) {
+        setSessions(res.sessions);
+      }
+    };
+    loadSessions();
+  }, []);
 
   useEffect(() => {
     const loadInterns = async () => {
@@ -69,13 +90,18 @@ export default function InternsListPage() {
       if (res.error) {
         toast.error(res.error);
       } else if (res.interns) {
-        setInterns(res.interns);
+        setInterns(res.interns as AdminInternListItem[]);
       }
       setLoading(false);
     };
 
     loadInterns();
   }, [toast]);
+
+  const handleSessionFilterChange = (id: string) => {
+    setSelectedSessionId(id);
+    localStorage.setItem('inotech_session_filter', id);
+  };
 
   // Filter & Search Logic
   const filteredInterns = interns.filter((intern) => {
@@ -94,7 +120,12 @@ export default function InternsListPage() {
     const matchesMissingDocs =
       !missingDocsOnly || (intern.applicationStatus === 'submitted' && intern.missingDocs.length > 0);
 
-    return matchesSearch && matchesStatus && matchesMissingDocs;
+    // 4. Session Match
+    const matchesSession =
+      selectedSessionId === 'all' ||
+      (intern.sessionId !== undefined && String(intern.sessionId) === selectedSessionId);
+
+    return matchesSearch && matchesStatus && matchesMissingDocs && matchesSession;
   });
 
   // Calculate Pagination Variables
@@ -157,7 +188,23 @@ export default function InternsListPage() {
         </div>
 
         {/* Filters */}
-        <div className="flex flex-wrap items-center gap-4">
+        <div className="flex flex-wrap items-center gap-5">
+          <div className="flex items-center gap-2 text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+            <span>Session:</span>
+            <select
+              value={selectedSessionId}
+              onChange={(e) => handleSessionFilterChange(e.target.value)}
+              className="px-3 py-1.5 border border-neutral-200 dark:border-neutral-800 rounded-lg bg-white dark:bg-neutral-950 focus:outline-none text-neutral-700 dark:text-neutral-300 font-semibold cursor-pointer"
+            >
+              <option value="all">All Sessions</option>
+              {sessions.map((session) => (
+                <option key={session.id} value={String(session.id)}>
+                  {session.sessionName}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <label className="flex items-center gap-2 text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider cursor-pointer">
             <input
               type="checkbox"
@@ -197,6 +244,7 @@ export default function InternsListPage() {
             <tr className="bg-neutral-50 dark:bg-neutral-900 border-b border-neutral-100 dark:border-neutral-800">
               <th className="px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-neutral-400">Name</th>
               <th className="px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-neutral-400">Status</th>
+              <th className="px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-neutral-400">Session</th>
               <th className="px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-neutral-400">University &amp; Dept</th>
               <th className="px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-neutral-400">Missing Documents</th>
               <th className="px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-neutral-400 text-right">Actions</th>
@@ -217,6 +265,15 @@ export default function InternsListPage() {
                   </td>
                   <td className="px-6 py-4">
                     <Badge status={intern.applicationStatus} />
+                  </td>
+                  <td className="px-6 py-4">
+                    {intern.sessionName ? (
+                      <span className="font-semibold text-neutral-700 dark:text-neutral-350">
+                        {intern.sessionName}
+                      </span>
+                    ) : (
+                      <span className="text-xs text-neutral-400 italic">None</span>
+                    )}
                   </td>
                   <td className="px-6 py-4">
                     {intern.university ? (

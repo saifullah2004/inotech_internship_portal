@@ -7,7 +7,7 @@ import { logoutUser } from '@/lib/actions/auth';
 import { useToast } from '@/components/providers/ToastProvider';
 import Logo from '@/components/ui/Logo';
 import Button from '@/components/ui/Button';
-import { LayoutDashboard, Users, User, LogOut, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Calendar, Users, User, LogOut, Menu, X } from 'lucide-react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -27,6 +27,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const navItems = [
     { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
+    { name: 'Internship Sessions', href: '/admin/sessions', icon: Calendar },
     { name: 'Interns', href: '/admin/interns', icon: Users },
     { name: 'Profile', href: '/admin/profile', icon: User },
   ];

@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useTransition } from 'react';
+import React, { useState, useTransition, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { adminCreateInternManually } from '@/lib/actions/intern';
+import { adminGetActiveSessions } from '@/lib/actions/session';
 import { useToast } from '@/components/providers/ToastProvider';
 import Card from '@/components/ui/Card';
 import Input from '@/components/ui/Input';
@@ -15,6 +16,21 @@ export default function AddInternManuallyPage() {
   const toast = useToast();
   const [isPending, startTransition] = useTransition();
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [sessions, setSessions] = useState<{ id: number; sessionName: string }[]>([]);
+  const [selectedSessionId, setSelectedSessionId] = useState<string>('');
+
+  useEffect(() => {
+    const loadActiveSessions = async () => {
+      const res = await adminGetActiveSessions();
+      if (res.success && res.sessions && res.sessions.length > 0) {
+        setSessions(res.sessions);
+        setSelectedSessionId(String(res.sessions[0].id));
+      } else {
+        toast.info('No active internship sessions found. Please create an active session first.');
+      }
+    };
+    loadActiveSessions();
+  }, [toast]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -35,6 +51,7 @@ export default function AddInternManuallyPage() {
       'semester',
       'cgpa',
       'startDate',
+      'sessionId',
     ];
 
     textFields.forEach((field) => {
@@ -118,6 +135,42 @@ export default function AddInternManuallyPage() {
 
       <Card className="p-6 md:p-8">
         <form onSubmit={handleSubmit} className="space-y-8" noValidate>
+          {/* Session Assignment */}
+          <div>
+            <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-400 mb-4 pb-1.5 border-b border-neutral-100 dark:border-neutral-800">
+              Session Assignment
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="sessionId" className="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+                  Internship Session <span className="text-rose-500">*</span>
+                </label>
+                <select
+                  id="sessionId"
+                  name="sessionId"
+                  value={selectedSessionId}
+                  onChange={(e) => setSelectedSessionId(e.target.value)}
+                  required
+                  className={`w-full px-3.5 py-2.5 rounded-lg border text-sm bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand cursor-pointer ${
+                    errors.sessionId ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-500' : ''
+                  }`}
+                >
+                  <option value="" disabled>Select Internship Session</option>
+                  {sessions.map((s) => (
+                    <option key={s.id} value={String(s.id)}>
+                      {s.sessionName}
+                    </option>
+                  ))}
+                </select>
+                {errors.sessionId && (
+                  <p className="text-xs font-medium text-rose-600 dark:text-rose-405">
+                    {errors.sessionId}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
           {/* Personal Info */}
           <div>
             <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-400 mb-4 pb-1.5 border-b border-neutral-100 dark:border-neutral-800">
