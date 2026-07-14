@@ -110,14 +110,8 @@ export default function RootPage() {
                     <Award className="w-3.5 h-3.5" />
                     <span>About Inotech Solutions</span>
                   </div>
-                  <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-                    Pioneering Innovation & Quality
-                  </h2>
                   <p className="text-slate-600 leading-relaxed text-sm">
-                    Inotech Solutions (Pvt) Ltd is a premier technology services and consulting provider committed to delivering innovative, reliable, and high-performance software products. We specialize in building cutting-edge web applications, corporate systems, and digital ecosystems that empower organizations to scale and succeed.
-                  </p>
-                  <p className="text-slate-600 leading-relaxed text-sm">
-                    Our professional team of software engineers, architects, and designers work closely with industry leaders and academic partners to bridge the gap between academic theory and practical technology implementation.
+                    Welcome to Inotech Solutions Pvt Ltd, One of the few IT system integration, professional service and software companies in South Asia that works with Enterprise system and companies. As a privately owned company, Inotech Solutions provides IT Consultancy, software design and development as well as professional services and hardware deployment and maintenance to the Government, Semi Government, Defense, and Private Sectors, ERP Solutions, Data Centre Management and cloud computing, Cyber Security, Health Care with State of the art HMIS software, eLearning, eEnrollment and eExam etc.
                   </p>
                 </div>
               </div>
@@ -127,16 +121,10 @@ export default function RootPage() {
                 <div className="space-y-4">
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-light text-brand text-xs font-semibold uppercase tracking-wider transition-colors duration-300 group-hover:bg-brand group-hover:text-white">
                     <BookOpen className="w-3.5 h-3.5" />
-                    <span>Internship Management System</span>
+                    <span>About the Internship Documentation Portal</span>
                   </div>
-                  <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-                    Bridging Academy & Industry
-                  </h2>
                   <p className="text-slate-650 leading-relaxed text-sm">
-                    The Internship Management System at Inotech Solutions is designed to streamline the lifecycle of internships. From registration and secure documentation submission to project monitoring and evaluations, this portal ensures a smooth experience for interns and supervisors.
-                  </p>
-                  <p className="text-slate-600 leading-relaxed text-sm">
-                    By providing a structured workflow, the platform helps interns focus on learning and developing real-world project experience while ensuring that supervisors and administrators can easily track and evaluate progress.
+                    The Internship Documentation Portal is designed to streamline and manage the intern onboarding and documentation process efficiently. It provides a centralized platform for interns to submit their necessary documents and for administrators to review, verify, approve, or reject these submissions seamlessly. The system ensures that all required documentation is collected and processed accurately, facilitating smooth batch allocation and a well-organized internship management workflow.
                   </p>
                 </div>
               </div>
@@ -186,7 +174,7 @@ export default function RootPage() {
             <div className="text-center max-w-3xl mx-auto mb-12">
               <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">Key Services & Portal Features</h2>
               <p className="mt-4 text-slate-600">
-                Our Internship Management System is equipped with robust tools designed to support each participant during their professional development journey.
+                Our Internship Documentation Portal is equipped with robust tools designed to support each participant during their professional development journey.
               </p>
             </div>
 
@@ -198,9 +186,9 @@ export default function RootPage() {
                   <div className="p-2.5 bg-brand-light text-brand rounded-xl w-fit transition-colors duration-300 group-hover:bg-brand group-hover:text-white">
                     <Users className="w-6 h-6" />
                   </div>
-                  <h3 className="text-lg font-bold text-slate-900">Intern and Supervisor Management</h3>
+                  <h3 className="text-lg font-bold text-slate-900">Intern Documentation Management</h3>
                   <p className="text-sm text-slate-600 leading-relaxed">
-                    Easy registration, profile setup, and secure role-based access for interns and industry mentors.
+                    Manage and upload all required internship documents, including CV, CNIC, cover letter, and verification certificates, through a secure and user-friendly portal. Track the status of submitted documents in real time.
                   </p>
                 </div>
               </div>
@@ -213,7 +201,7 @@ export default function RootPage() {
                   </div>
                   <h3 className="text-lg font-bold text-slate-900">Internship Registration</h3>
                   <p className="text-sm text-slate-600 leading-relaxed">
-                    Complete online registration and document submission (CVs, letters, CNIC, and police verification) through a secure dashboard.
+                    Register for the internship by completing the online application and submitting the required documents. Once verified by the administrator, approved interns are assigned to their respective internship batches.
                   </p>
                 </div>
               </div>
@@ -222,60 +210,7 @@ export default function RootPage() {
           </div>
         </section>
 
-        {/* Benefits Section */}
-        <section className="py-16 bg-slate-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-extrabold text-slate-900 text-center tracking-tight mb-12">Portal Benefits</h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-
-              {/* For Interns */}
-              <div className="group bg-white p-8 rounded-2xl border border-slate-100 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-brand/40 hover:shadow-[0_0_30px_rgba(226,99,33,0.15)] hover:bg-brand-light/10 animate-fade-in-up">
-                <div className="w-10 h-10 rounded-lg bg-brand-light text-brand flex items-center justify-center font-bold mb-4 transition-colors duration-300 group-hover:bg-brand group-hover:text-white">
-                  1
-                </div>
-                <h3 className="text-lg font-bold text-brand mb-4">For Interns</h3>
-                <ul className="space-y-3 text-sm text-slate-650">
-                  <li className="flex items-center gap-2.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-slate-400 transition-colors duration-300 group-hover:bg-brand" />
-                    <span>Structured registration workflow</span>
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-slate-400 transition-colors duration-300 group-hover:bg-brand" />
-                    <span>Real-time updates on status</span>
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-slate-400 transition-colors duration-300 group-hover:bg-brand" />
-                    <span>Secure document storage</span>
-                  </li>
-                </ul>
-              </div>
-
-              {/* For Administrators */}
-              <div className="group bg-white p-8 rounded-2xl border border-slate-100 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-brand/40 hover:shadow-[0_0_30px_rgba(226,99,33,0.15)] hover:bg-brand-light/10 animate-fade-in-up animation-delay-100">
-                <div className="w-10 h-10 rounded-lg bg-brand-light text-brand flex items-center justify-center font-bold mb-4 transition-colors duration-300 group-hover:bg-brand group-hover:text-white">
-                  2
-                </div>
-                <h3 className="text-lg font-bold text-brand mb-4">For Administrators</h3>
-                <ul className="space-y-3 text-sm text-slate-650">
-                  <li className="flex items-center gap-2.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-slate-400 transition-colors duration-300 group-hover:bg-brand" />
-                    <span>Overview of all active applications</span>
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-slate-400 transition-colors duration-300 group-hover:bg-brand" />
-                    <span>System audits and logs</span>
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-slate-400 transition-colors duration-300 group-hover:bg-brand" />
-                    <span>Automated report compilation</span>
-                  </li>
-                </ul>
-              </div>
-
-            </div>
-          </div>
-        </section>
       </main>
 
       {/* Footer */}
