@@ -515,6 +515,11 @@ export async function adminUpdateInternDetails(userId: number, formData: FormDat
       semester: string;
       cgpa: number;
       startDate: Date;
+      picturePath?: string;
+      cvPath?: string;
+      cnicPath?: string;
+      recommendationLetterPath?: string;
+      policeVerificationPath?: string;
     } = {
       fullName,
       fatherName,

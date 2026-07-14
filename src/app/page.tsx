@@ -21,7 +21,7 @@ const SLIDES = [
   {
     path: '/images/slide3.jpg',
     title: 'Streamlined Internship Workflows',
-    subtitle: 'An all-in-one portal for students, supervisors, and administrators.'
+    subtitle: 'An all-in-one portal for interns, supervisors, and administrators.'
   },
   {
     path: '/images/slide4.jpg',
@@ -47,12 +47,20 @@ export default function RootPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <Logo href="/" />
 
-          <Link
-            href="/login"
-            className="px-5 py-2 rounded-lg bg-brand hover:bg-brand-hover text-white font-semibold text-sm transition-all duration-200 shadow-xs hover:shadow-md active:scale-95 cursor-pointer"
-          >
-            Login
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/login"
+              className="px-5 py-2 rounded-lg bg-brand hover:bg-brand-hover text-white font-semibold text-sm transition-all duration-200 shadow-xs hover:shadow-md active:scale-95 cursor-pointer text-center min-w-[90px]"
+            >
+              Login
+            </Link>
+            <Link
+              href="/register"
+              className="px-5 py-2 rounded-lg bg-white border border-brand text-brand hover:text-brand-hover font-semibold text-sm transition-all duration-200 shadow-xs hover:shadow-[0_0_12px_rgba(226,99,33,0.4)] active:scale-95 cursor-pointer text-center min-w-[90px]"
+            >
+              Sign Up
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -124,8 +132,8 @@ export default function RootPage() {
                   <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
                     Bridging Academy & Industry
                   </h2>
-                  <p className="text-slate-600 leading-relaxed text-sm">
-                    The Internship Management System at Inotech Solutions is designed to streamline the lifecycle of student internships. From registration and secure documentation submission to project monitoring and evaluations, this portal ensures a smooth experience for students and supervisors.
+                  <p className="text-slate-650 leading-relaxed text-sm">
+                    The Internship Management System at Inotech Solutions is designed to streamline the lifecycle of internships. From registration and secure documentation submission to project monitoring and evaluations, this portal ensures a smooth experience for interns and supervisors.
                   </p>
                   <p className="text-slate-600 leading-relaxed text-sm">
                     By providing a structured workflow, the platform helps interns focus on learning and developing real-world project experience while ensuring that supervisors and administrators can easily track and evaluate progress.
@@ -150,7 +158,7 @@ export default function RootPage() {
                 <div>
                   <h3 className="text-xl font-bold text-slate-900 mb-2">Our Mission</h3>
                   <p className="text-slate-600 leading-relaxed text-sm">
-                    To deliver premium-quality, secure, and robust technology solutions while nurturing next-generation developer talent. We aim to establish a pathway for students to learn best engineering practices and successfully transition into professional software roles.
+                    To deliver premium-quality, secure, and robust technology solutions while nurturing next-generation developer talent. We aim to establish a pathway for interns to learn best engineering practices and successfully transition into professional software roles.
                   </p>
                 </div>
               </div>
@@ -190,9 +198,9 @@ export default function RootPage() {
                   <div className="p-2.5 bg-brand-light text-brand rounded-xl w-fit transition-colors duration-300 group-hover:bg-brand group-hover:text-white">
                     <Users className="w-6 h-6" />
                   </div>
-                  <h3 className="text-lg font-bold text-slate-900">Student & Supervisor Management</h3>
+                  <h3 className="text-lg font-bold text-slate-900">Intern and Supervisor Management</h3>
                   <p className="text-sm text-slate-600 leading-relaxed">
-                    Easy registration, profile setup, and secure role-based access for students and industry mentors.
+                    Easy registration, profile setup, and secure role-based access for interns and industry mentors.
                   </p>
                 </div>
               </div>
@@ -221,12 +229,12 @@ export default function RootPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
 
-              {/* For Students */}
+              {/* For Interns */}
               <div className="group bg-white p-8 rounded-2xl border border-slate-100 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-brand/40 hover:shadow-[0_0_30px_rgba(226,99,33,0.15)] hover:bg-brand-light/10 animate-fade-in-up">
                 <div className="w-10 h-10 rounded-lg bg-brand-light text-brand flex items-center justify-center font-bold mb-4 transition-colors duration-300 group-hover:bg-brand group-hover:text-white">
                   1
                 </div>
-                <h3 className="text-lg font-bold text-brand mb-4">For Students</h3>
+                <h3 className="text-lg font-bold text-brand mb-4">For Interns</h3>
                 <ul className="space-y-3 text-sm text-slate-650">
                   <li className="flex items-center gap-2.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-slate-400 transition-colors duration-300 group-hover:bg-brand" />
@@ -253,10 +261,6 @@ export default function RootPage() {
                   <li className="flex items-center gap-2.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-slate-400 transition-colors duration-300 group-hover:bg-brand" />
                     <span>Overview of all active applications</span>
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-slate-400 transition-colors duration-300 group-hover:bg-brand" />
-                    <span>Granular status management</span>
                   </li>
                   <li className="flex items-center gap-2.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-slate-400 transition-colors duration-300 group-hover:bg-brand" />
