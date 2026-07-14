@@ -15,7 +15,7 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
-import { Loader2, LogOut, CheckCircle2, AlertTriangle, FileText, Upload, User, GraduationCap, Phone, MapPin, Calendar } from 'lucide-react';
+import { Loader2, LogOut, CheckCircle2, AlertTriangle, FileText, Upload, User, GraduationCap } from 'lucide-react';
 import { InternDetail } from '@prisma/client';
 import Modal from '@/components/ui/Modal';
 
@@ -788,7 +788,7 @@ export default function UserDashboard() {
                   <span className="font-semibold text-neutral-800 dark:text-neutral-250">{reviewDetails.fullName}</span>
                 </div>
                 <div>
-                  <span className="text-neutral-400 block">Father's Name</span>
+                  <span className="text-neutral-400 block">Father&apos;s Name</span>
                   <span className="font-semibold text-neutral-800 dark:text-neutral-250">{reviewDetails.fatherName}</span>
                 </div>
                 <div>

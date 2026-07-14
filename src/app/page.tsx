@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 import Logo from '@/components/ui/Logo';
@@ -62,10 +63,13 @@ export default function RootPage() {
             className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out ${idx === currentSlide ? 'opacity-100' : 'opacity-0'
               }`}
           >
-            <img
+            <Image
               src={slide.path}
               alt={`Slide ${idx + 1}`}
-              className="w-full h-full object-cover"
+              fill
+              sizes="100vw"
+              priority={idx === 0}
+              className="object-cover"
             />
           </div>
         ))}

@@ -505,7 +505,17 @@ export async function adminUpdateInternDetails(userId: number, formData: FormDat
     const startDate = formData.get('startDate') as string;
 
     // Build update data
-    const updateData: any = {
+    const updateData: {
+      fullName: string;
+      fatherName: string;
+      phone: string;
+      address: string;
+      university: string;
+      department: string;
+      semester: string;
+      cgpa: number;
+      startDate: Date;
+    } = {
       fullName,
       fatherName,
       phone,
