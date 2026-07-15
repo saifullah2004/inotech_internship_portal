@@ -14,12 +14,65 @@ async function getAdminUser() {
   return decoded;
 }
 
+// Helper to calculate status based on start/end dates
+function calculateSessionStatus(startDate: Date, endDate: Date): string {
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const sessionStart = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+  const sessionEnd = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+
+  if (today < sessionStart) {
+    return 'Pending';
+  } else if (today > sessionEnd) {
+    return 'Completed';
+  } else {
+    return 'Active';
+  }
+}
+
+// Auto update session statuses based on current date
+export async function autoUpdateSessionStatuses() {
+  try {
+    const sessions = await db.internshipSession.findMany();
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    for (const session of sessions) {
+      const sessionEnd = new Date(session.endDate.getFullYear(), session.endDate.getMonth(), session.endDate.getDate());
+      const sessionStart = new Date(session.startDate.getFullYear(), session.startDate.getMonth(), session.startDate.getDate());
+
+      let newStatus = session.status;
+
+      // 1. If today is after the end date, it must automatically become Completed
+      if (today > sessionEnd) {
+        newStatus = 'Completed';
+      }
+      // 2. If it is Pending, and today has reached the start date, it automatically becomes Active
+      else if (session.status === 'Pending' && today >= sessionStart && today <= sessionEnd) {
+        newStatus = 'Active';
+      }
+
+      if (session.status !== newStatus) {
+        await db.internshipSession.update({
+          where: { id: session.id },
+          data: { status: newStatus },
+        });
+      }
+    }
+  } catch (error) {
+    console.error('Error auto-updating session statuses:', error);
+  }
+}
+
 // Admin Action: Fetch all sessions with assigned interns count
 export async function adminGetSessions() {
   const admin = await getAdminUser();
   if (!admin) return { error: 'Unauthorized' };
 
   try {
+    // Automatically update statuses first
+    await autoUpdateSessionStatuses();
+
     const sessions = await db.internshipSession.findMany({
       include: {
         _count: {
@@ -55,6 +108,9 @@ export async function adminGetActiveSessions() {
   if (!admin) return { error: 'Unauthorized' };
 
   try {
+    // Automatically update statuses first
+    await autoUpdateSessionStatuses();
+
     const sessions = await db.internshipSession.findMany({
       where: { status: 'Active' },
       orderBy: { startDate: 'desc' },
@@ -83,12 +139,15 @@ export async function adminCreateSession(formData: FormData) {
   if (!admin) return { error: 'Unauthorized' };
 
   try {
+    // Automatically update statuses first
+    await autoUpdateSessionStatuses();
+
     const sessionName = (formData.get('sessionName') as string || '').trim();
     const sessionCode = (formData.get('sessionCode') as string || '').trim();
     const description = (formData.get('description') as string || '').trim();
     const startDateStr = formData.get('startDate') as string;
     const endDateStr = formData.get('endDate') as string;
-    const status = formData.get('status') as string || 'Active';
+    const formStatus = formData.get('status') as string;
 
     // Validation
     if (!sessionName) {
@@ -108,6 +167,8 @@ export async function adminCreateSession(formData: FormData) {
     if (endDate <= startDate) {
       return { error: 'End Date must be strictly after the Start Date' };
     }
+
+    const status = formStatus || calculateSessionStatus(startDate, endDate);
 
     // Prevent duplicate active sessions with same name
     if (status === 'Active') {
@@ -146,12 +207,15 @@ export async function adminUpdateSession(id: number, formData: FormData) {
   if (!admin) return { error: 'Unauthorized' };
 
   try {
+    // Automatically update statuses first
+    await autoUpdateSessionStatuses();
+
     const sessionName = (formData.get('sessionName') as string || '').trim();
     const sessionCode = (formData.get('sessionCode') as string || '').trim();
     const description = (formData.get('description') as string || '').trim();
     const startDateStr = formData.get('startDate') as string;
     const endDateStr = formData.get('endDate') as string;
-    const status = formData.get('status') as string || 'Active';
+    const formStatus = formData.get('status') as string;
 
     // Validation
     if (!sessionName) {
@@ -171,6 +235,8 @@ export async function adminUpdateSession(id: number, formData: FormData) {
     if (endDate <= startDate) {
       return { error: 'End Date must be strictly after the Start Date' };
     }
+
+    const status = formStatus || calculateSessionStatus(startDate, endDate);
 
     // Prevent duplicate active sessions with same name
     if (status === 'Active') {
@@ -211,6 +277,9 @@ export async function adminDeleteSession(id: number) {
   if (!admin) return { error: 'Unauthorized' };
 
   try {
+    // Automatically update statuses first
+    await autoUpdateSessionStatuses();
+
     // Check if there are any users (interns) assigned to this session
     const internsCount = await db.user.count({
       where: {

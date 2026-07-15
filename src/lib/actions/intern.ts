@@ -4,6 +4,7 @@ import { cookies } from 'next/headers';
 import { db } from '@/lib/db';
 import { verifyJWT, signJWT } from '@/lib/auth';
 import { internDetailsSchema, adminPasswordSchema } from '@/lib/validations';
+import { autoUpdateSessionStatuses } from './session';
 import fs from 'fs/promises';
 import path from 'path';
 import bcrypt from 'bcryptjs';
@@ -22,6 +23,31 @@ export async function checkUserStatus() {
   if (!sessionUser) return { error: 'Unauthorized' };
 
   try {
+    // Automatically update statuses first
+    await autoUpdateSessionStatuses();
+
+    // Check if the user is a normal user (role === 'user') and doesn't have an assigned session (sessionId === null)
+    const userToVerify = await db.user.findUnique({
+      where: { id: sessionUser.userId },
+    });
+
+    if (userToVerify && userToVerify.role === 'user' && !userToVerify.sessionId) {
+      // Find latest active session
+      const latestActive = await db.internshipSession.findFirst({
+        where: { status: 'Active' },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      if (latestActive) {
+        // Assign this user to the newly active session!
+        await db.user.update({
+          where: { id: sessionUser.userId },
+          data: { sessionId: latestActive.id },
+        });
+      }
+    }
+
+    // Now reload user details with the potentially updated sessionId session reference
     const user = await db.user.findUnique({
       where: { id: sessionUser.userId },
       include: {
@@ -55,6 +81,22 @@ export async function checkUserStatus() {
       });
     }
 
+    // Determine if an Active session exists
+    const activeSessionCount = await db.internshipSession.count({
+      where: { status: 'Active' },
+    });
+
+    let latestCompletedSessionName: string | null = null;
+    if (activeSessionCount === 0) {
+      const latestCompleted = await db.internshipSession.findFirst({
+        where: { status: 'Completed' },
+        orderBy: { endDate: 'desc' },
+      });
+      if (latestCompleted) {
+        latestCompletedSessionName = latestCompleted.sessionName;
+      }
+    }
+
     return {
       success: true,
       user: {
@@ -75,6 +117,8 @@ export async function checkUserStatus() {
         status: user.session.status,
       } : null,
       latestRequest: user.internRequests[0] || null,
+      noActiveSession: activeSessionCount === 0,
+      latestCompletedSessionName,
     };
   } catch (error) {
     console.error('Check user status error:', error);
@@ -152,8 +196,9 @@ export async function submitInternshipDetails(formData: FormData) {
     });
 
     if (!user) return { error: 'User not found' };
-    if (user.applicationStatus !== 'approved') {
-      return { error: 'Your account is not approved to submit details' };
+    // Allow submission from not_submitted (first-time) or approved (re-submit after admin re-opens)
+    if (user.applicationStatus !== 'not_submitted' && user.applicationStatus !== 'approved') {
+      return { error: 'You cannot submit details at this stage' };
     }
     if (user.internDetails) {
       return { error: 'You have already submitted your details' };
@@ -247,9 +292,9 @@ export async function submitInternshipDetails(formData: FormData) {
       }
     }
 
-    // 4. Save to database
-    await db.$transaction([
-      db.internDetail.create({
+    // 4. Save to database — status becomes pending_approval (admin must approve)
+    await db.$transaction(async (tx) => {
+      await tx.internDetail.create({
         data: {
           userId: user.id,
           fullName,
@@ -268,22 +313,29 @@ export async function submitInternshipDetails(formData: FormData) {
           policeVerificationPath: filePaths.policeVerification,
           termsAccepted: true,
         },
-      }),
-      db.user.update({
+      });
+      // Create a pending internship request for admin review
+      await tx.internRequest.create({
+        data: {
+          userId: user.id,
+          status: 'pending',
+        },
+      });
+      await tx.user.update({
         where: { id: user.id },
         data: {
-          applicationStatus: 'submitted',
+          applicationStatus: 'pending_approval',
         },
-      }),
-    ]);
+      });
+    });
 
-    // Re-sign JWT
+    // Re-sign JWT with pending_approval
     const token = await signJWT({
       userId: user.id,
       email: user.email,
       role: user.role,
       name: user.name,
-      applicationStatus: 'submitted',
+      applicationStatus: 'pending_approval',
     });
 
     const cookieStore = await cookies();
@@ -295,14 +347,7 @@ export async function submitInternshipDetails(formData: FormData) {
       maxAge: 60 * 60 * 24,
     });
 
-    const missingDocs: string[] = [];
-    if (!filePaths.recommendationLetter) missingDocs.push('University Recommendation Letter');
-    if (!filePaths.policeVerification) missingDocs.push('Police Verification Certificate');
-
-    return {
-      success: true,
-      missingDocs: missingDocs.length > 0 ? missingDocs : null,
-    };
+    return { success: true };
   } catch (error) {
     console.error('Submit intern details error:', error);
     return { error: 'Failed to upload details. Please try again.' };
@@ -496,8 +541,10 @@ export async function adminDecideRequest(userId: number, status: 'approved' | 'd
       orderBy: { requestedAt: 'desc' },
     });
 
-    const statusMap = {
-      approved: 'approved',
+    // When admin approves: intern already submitted their details, so move to 'submitted'
+    // When admin declines: set to 'declined'
+    const statusMap: Record<string, string> = {
+      approved: 'submitted',
       declined: 'declined',
     };
 

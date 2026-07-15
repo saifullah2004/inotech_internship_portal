@@ -78,6 +78,7 @@ export default function AdminDashboard() {
       description: selectedSessionId === 'all' ? 'Registered users in portal' : 'Registrations in selected session',
       icon: Users,
       color: 'text-neutral-500 bg-neutral-50 dark:bg-neutral-800/50',
+      statusKey: 'all',
     },
     {
       title: 'Active Interns',
@@ -85,6 +86,7 @@ export default function AdminDashboard() {
       description: selectedSessionId === 'all' ? 'Profiles uploaded details' : 'Active interns in selected session',
       icon: CheckCircle,
       color: 'text-brand bg-brand/5 dark:bg-brand/10',
+      statusKey: 'submitted',
     },
     {
       title: 'Pending Requests',
@@ -92,6 +94,7 @@ export default function AdminDashboard() {
       description: selectedSessionId === 'all' ? 'Awaiting initial approval' : 'Pending requests in selected session',
       icon: Clock,
       color: 'text-amber-600 bg-amber-50 dark:bg-amber-950/20',
+      statusKey: 'pending_approval',
     },
   ];
 
@@ -103,6 +106,7 @@ export default function AdminDashboard() {
       description: 'Currently running batch',
       icon: Calendar,
       color: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-950/20',
+      link: '/admin/sessions',
     },
     {
       key: 'interns-active',
@@ -111,6 +115,7 @@ export default function AdminDashboard() {
       description: 'Enrolled in current active batch',
       icon: Users,
       color: 'text-brand bg-brand/5 dark:bg-brand/10',
+      link: '/admin/interns',
     },
     {
       key: 'total-sessions',
@@ -123,6 +128,7 @@ export default function AdminDashboard() {
       description: 'All created batches',
       icon: Folder,
       color: 'text-neutral-500 bg-neutral-50 dark:bg-neutral-800/50',
+      link: '/admin/sessions',
     },
     {
       key: 'completed-sessions',
@@ -131,6 +137,7 @@ export default function AdminDashboard() {
       description: 'Archived internship batches',
       icon: CheckCircle,
       color: 'text-blue-600 bg-blue-50 dark:bg-blue-950/20',
+      link: '/admin/sessions',
     },
   ];
 
@@ -176,22 +183,29 @@ export default function AdminDashboard() {
           {statCards.map((card) => {
             const Icon = card.icon;
             return (
-              <Card key={card.title} className="p-6 border border-neutral-100 dark:border-neutral-800">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <span className="text-xs font-bold uppercase tracking-wider text-neutral-400">
-                      {card.title}
-                    </span>
-                    <span className="text-3xl font-extrabold block mt-2 text-neutral-800 dark:text-neutral-50">
-                      {card.value}
-                    </span>
+              <LinkItem
+                key={card.title}
+                href="/admin/interns"
+                onClick={() => localStorage.setItem('inotech_status_filter', card.statusKey)}
+                className="block cursor-pointer"
+              >
+                <Card className="p-6 border border-neutral-100 dark:border-neutral-800 h-full">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <span className="text-xs font-bold uppercase tracking-wider text-neutral-400">
+                        {card.title}
+                      </span>
+                      <span className="text-3xl font-extrabold block mt-2 text-neutral-800 dark:text-neutral-50">
+                        {card.value}
+                      </span>
+                    </div>
+                    <div className={`p-3 rounded-lg transition-all duration-300 group-hover:bg-brand group-hover:text-white ${card.color}`}>
+                      <Icon className="w-5 h-5" />
+                    </div>
                   </div>
-                  <div className={`p-3 rounded-lg ${card.color}`}>
-                    <Icon className="w-5 h-5" />
-                  </div>
-                </div>
-                <p className="text-xs text-neutral-400 mt-4">{card.description}</p>
-              </Card>
+                  <p className="text-xs text-neutral-400 mt-4">{card.description}</p>
+                </Card>
+              </LinkItem>
             );
           })}
         </div>
@@ -203,23 +217,28 @@ export default function AdminDashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {sessionStatCards.map((card) => {
             const Icon = card.icon;
+            const isNameCard = card.key === 'active-session';
             return (
-              <Card key={card.key} className="p-6 border border-neutral-100 dark:border-neutral-805">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <span className="text-xs font-bold uppercase tracking-wider text-neutral-400">
-                      {card.title}
-                    </span>
-                    <span className="text-base sm:text-lg font-extrabold block mt-2 text-neutral-800 dark:text-neutral-50 break-words leading-snug" title={String(card.value)}>
-                      {card.value}
-                    </span>
+              <LinkItem key={card.key} href={card.link} className="block cursor-pointer">
+                <Card className="p-6 border border-neutral-100 dark:border-neutral-805 h-full">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <span className="text-xs font-bold uppercase tracking-wider text-neutral-400">
+                        {card.title}
+                      </span>
+                      <span className={`${
+                        isNameCard ? 'text-xs sm:text-sm font-bold mt-2.5' : 'text-base sm:text-lg font-extrabold mt-2'
+                      } block text-neutral-800 dark:text-neutral-50 break-words leading-snug`} title={String(card.value)}>
+                        {card.value}
+                      </span>
+                    </div>
+                    <div className={`p-2.5 rounded-lg transition-all duration-300 group-hover:bg-brand group-hover:text-white ${card.color}`}>
+                      <Icon className="w-4 h-4" />
+                    </div>
                   </div>
-                  <div className={`p-2.5 rounded-lg ${card.color}`}>
-                    <Icon className="w-4 h-4" />
-                  </div>
-                </div>
-                <p className="text-xs text-neutral-400 mt-4">{card.description}</p>
-              </Card>
+                  <p className="text-xs text-neutral-400 mt-4">{card.description}</p>
+                </Card>
+              </LinkItem>
             );
           })}
         </div>

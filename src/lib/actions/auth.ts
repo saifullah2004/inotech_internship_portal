@@ -5,6 +5,7 @@ import bcrypt from 'bcryptjs';
 import { db } from '@/lib/db';
 import { signJWT } from '@/lib/auth';
 import { loginSchema, registerSchema } from '@/lib/validations';
+import { autoUpdateSessionStatuses } from './session';
 
 export async function registerUser(prevState: unknown, formData: FormData) {
   try {
@@ -29,6 +30,9 @@ export async function registerUser(prevState: unknown, formData: FormData) {
     // Hash password
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
+
+    // Automatically update statuses first
+    await autoUpdateSessionStatuses();
 
     // Find latest active session
     const latestSession = await db.internshipSession.findFirst({

@@ -8,7 +8,7 @@ import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Modal from '@/components/ui/Modal';
-import { Loader2, Plus, Calendar, Edit2, Trash2, Folder, Clock, Users, ArrowRight } from 'lucide-react';
+import { Loader2, Plus, Calendar, Edit2, Trash2, Folder, Clock, Users, ArrowRight, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface Session {
   id: number;
@@ -26,6 +26,11 @@ export default function SessionsPage() {
   const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [sessions, setSessions] = useState<Session[]>([]);
+
+  // Search & Pagination state
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 6;
 
   // Modals state
   const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -56,6 +61,27 @@ export default function SessionsPage() {
   useEffect(() => {
     loadSessions();
   }, [loadSessions]);
+
+  // Reset page when search term changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
+  const filteredSessions = sessions.filter((session) => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      session.sessionName.toLowerCase().includes(searchLower) ||
+      (session.sessionCode && session.sessionCode.toLowerCase().includes(searchLower))
+    );
+  });
+
+  const totalItems = filteredSessions.length;
+  const totalPages = Math.ceil(totalItems / pageSize) || 1;
+  const activePage = Math.min(currentPage, totalPages);
+  
+  const startIndex = (activePage - 1) * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, totalItems);
+  const paginatedSessions = filteredSessions.slice(startIndex, startIndex + pageSize);
 
   // Form Validation
   const validateForm = (formData: FormData): boolean => {
@@ -153,7 +179,6 @@ export default function SessionsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Internship Sessions</h2>
-          <p className="text-sm text-neutral-500">Manage cohorts, view enrollment numbers, and archive completed batches.</p>
         </div>
         <div>
           <Button
@@ -170,126 +195,167 @@ export default function SessionsPage() {
         </div>
       </div>
 
-      {/* Grid of Sessions */}
-      {sessions.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {sessions.map((session) => (
-            <Card key={session.id} className="p-6 border border-neutral-100 dark:border-neutral-800 flex flex-col justify-between hover:shadow-md transition-shadow duration-200">
-              <div className="space-y-4">
-                {/* Status and Icon */}
-                <div className="flex justify-between items-start">
-                  <div className="p-2.5 rounded-lg bg-brand/5 dark:bg-brand/10 text-brand">
-                    <Calendar className="w-5 h-5" />
-                  </div>
-                  <Badge status={session.status} />
-                </div>
-
-                {/* Session Name & Code */}
-                <div>
-                  <h3 className="text-lg font-bold text-neutral-800 dark:text-neutral-100 leading-snug">
-                    {session.sessionName}
-                  </h3>
-                  {session.sessionCode && (
-                    <span className="inline-block text-xs font-semibold px-2 py-0.5 bg-neutral-150 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 rounded-md mt-1">
-                      {session.sessionCode}
-                    </span>
-                  )}
-                </div>
-
-                {/* Description */}
-                {session.description ? (
-                  <p className="text-xs text-neutral-500 dark:text-neutral-400 line-clamp-2 leading-relaxed">
-                    {session.description}
-                  </p>
-                ) : (
-                  <p className="text-xs text-neutral-400 dark:text-neutral-500 italic">No description provided.</p>
-                )}
-
-                {/* Date range details */}
-                <div className="grid grid-cols-2 gap-2 text-xs border-t border-b border-neutral-100 dark:border-neutral-800/80 py-3 my-2">
-                  <div>
-                    <span className="text-neutral-400 block uppercase tracking-wider font-semibold text-[9px]">Start Date</span>
-                    <span className="font-semibold text-neutral-700 dark:text-neutral-350">
-                      {new Date(session.startDate).toLocaleDateString(undefined, {
-                        day: 'numeric',
-                        month: 'short',
-                        year: 'numeric',
-                      })}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-neutral-400 block uppercase tracking-wider font-semibold text-[9px]">End Date</span>
-                    <span className="font-semibold text-neutral-700 dark:text-neutral-350">
-                      {new Date(session.endDate).toLocaleDateString(undefined, {
-                        day: 'numeric',
-                        month: 'short',
-                        year: 'numeric',
-                      })}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Stats block */}
-                <div className="flex items-center gap-4 text-xs text-neutral-500 dark:text-neutral-400">
-                  <span className="flex items-center gap-1">
-                    <Users className="w-3.5 h-3.5 text-neutral-400" />
-                    <span className="font-bold text-neutral-700 dark:text-neutral-300">
-                      {session.totalInterns}
-                    </span>{' '}
-                    interns
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5 text-neutral-400" />
-                    Created{' '}
-                    {new Date(session.createdAt).toLocaleDateString(undefined, {
-                      day: 'numeric',
-                      month: 'short',
-                    })}
-                  </span>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex gap-2.5 mt-6 pt-4 border-t border-neutral-100 dark:border-neutral-805">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  fullWidth
-                  onClick={() => {
-                    setSelectedSession(session);
-                    setErrors({});
-                    setEditModalOpen(true);
-                  }}
-                  className="flex items-center justify-center gap-1.5 text-xs py-1.5 cursor-pointer"
-                >
-                  <Edit2 className="w-3.5 h-3.5" />
-                  Edit
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  fullWidth
-                  onClick={() => {
-                    setSelectedSession(session);
-                    setDeleteConfirmOpen(true);
-                  }}
-                  className="flex items-center justify-center gap-1.5 border-rose-200 dark:border-rose-905 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20 text-xs py-1.5 cursor-pointer"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                  Delete
-                </Button>
-              </div>
-            </Card>
-          ))}
+      {/* Search Bar */}
+      <Card className="p-4 border border-neutral-100 dark:border-neutral-800 bg-white dark:bg-neutral-900">
+        <div className="relative max-w-md w-full">
+          <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-neutral-400 pointer-events-none">
+            <Search className="w-4 h-4" />
+          </span>
+          <input
+            type="text"
+            placeholder="Search by session name or code..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-9 pr-4 py-2 border border-neutral-200 dark:border-neutral-800 rounded-lg text-sm bg-white dark:bg-neutral-950 focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400"
+          />
         </div>
-      ) : (
+      </Card>
+
+      {/* Grid of Sessions */}
+      {sessions.length === 0 ? (
         <Card className="border border-neutral-100 dark:border-neutral-800 p-12 text-center text-neutral-400">
-          <Folder className="w-12 h-12 text-neutral-350 dark:text-neutral-750 mx-auto mb-3" />
+          <Folder className="w-12 h-12 text-neutral-355 dark:text-neutral-750 mx-auto mb-3" />
           <h3 className="font-bold text-neutral-700 dark:text-neutral-300 mb-1 text-base">No Sessions Found</h3>
           <p className="text-xs text-neutral-500 max-w-sm mx-auto leading-relaxed">
             There are no internship cohorts created yet. Click "Create New Session" to configure your first internship batch.
           </p>
         </Card>
+      ) : filteredSessions.length === 0 ? (
+        <Card className="border border-neutral-100 dark:border-neutral-800 p-12 text-center text-neutral-400">
+          <Folder className="w-12 h-12 text-neutral-355 dark:text-neutral-750 mx-auto mb-3" />
+          <h3 className="font-bold text-neutral-700 dark:text-neutral-300 mb-1 text-base">No Matching Sessions</h3>
+          <p className="text-xs text-neutral-500 max-w-sm mx-auto leading-relaxed">
+            No sessions match your search query &quot;{searchTerm}&quot;. Try adjusting your keywords.
+          </p>
+        </Card>
+      ) : (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {paginatedSessions.map((session) => (
+              <Card key={session.id} className="p-6 border border-neutral-100 dark:border-neutral-800 flex flex-col justify-between hover:shadow-md transition-shadow duration-200">
+                <div className="space-y-4">
+                  {/* Status and Icon */}
+                  <div className="flex justify-between items-start">
+                    <div className="p-2.5 rounded-lg bg-brand/5 dark:bg-brand/10 text-brand transition-all duration-300 group-hover:bg-brand group-hover:text-white">
+                      <Calendar className="w-5 h-5" />
+                    </div>
+                    <Badge status={session.status} />
+                  </div>
+
+                  {/* Session Name & Code */}
+                  <div>
+                    <h3 className="text-lg font-bold text-neutral-800 dark:text-neutral-100 leading-snug">
+                      {session.sessionName}
+                    </h3>
+                    {session.sessionCode && (
+                      <span className="inline-block text-xs font-semibold px-2 py-0.5 bg-neutral-150 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 rounded-md mt-1">
+                        {session.sessionCode}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Description */}
+                  {session.description ? (
+                    <p className="text-sm text-neutral-500 dark:text-neutral-450 line-clamp-2 leading-relaxed">
+                      {session.description}
+                    </p>
+                  ) : (
+                    <p className="text-sm text-neutral-400 dark:text-neutral-600 italic">
+                      No description provided.
+                    </p>
+                  )}
+
+                  {/* Timeline & Interns Counts */}
+                  <div className="border-t border-neutral-100 dark:border-neutral-800 pt-4 space-y-3">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-neutral-400 flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5" />
+                        Timeline
+                      </span>
+                      <span className="font-semibold text-neutral-700 dark:text-neutral-300">
+                        {new Date(session.startDate).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })} - {new Date(session.endDate).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-neutral-400 flex items-center gap-1.5">
+                        <Users className="w-3.5 h-3.5" />
+                        Total Interns
+                      </span>
+                      <span className="font-bold text-neutral-800 dark:text-neutral-200">
+                        {session.totalInterns}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-3 border-t border-neutral-100 dark:border-neutral-800 pt-4 mt-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    fullWidth
+                    onClick={() => {
+                      setSelectedSession(session);
+                      setErrors({});
+                      setEditModalOpen(true);
+                    }}
+                    className="flex items-center justify-center gap-1.5 text-xs py-1.5 cursor-pointer"
+                  >
+                    <Edit2 className="w-3.5 h-3.5" />
+                    Edit
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    fullWidth
+                    onClick={() => {
+                      setSelectedSession(session);
+                      setDeleteConfirmOpen(true);
+                    }}
+                    className="flex items-center justify-center gap-1.5 border-rose-200 dark:border-rose-905 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20 text-xs py-1.5 cursor-pointer"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    Delete
+                  </Button>
+                </div>
+              </Card>
+            ))}
+          </div>
+
+          {/* Pagination Footer */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between pt-4 px-2">
+              <span className="text-xs text-neutral-400">
+                Showing <span className="font-semibold">{startIndex + 1}</span> to{' '}
+                <span className="font-semibold">{endIndex}</span> of{' '}
+                <span className="font-semibold">{totalItems}</span> items
+              </span>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={activePage === 1}
+                  onClick={() => setCurrentPage((prev) => prev - 1)}
+                  className="flex items-center gap-1 cursor-pointer"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  Previous
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={activePage === totalPages}
+                  onClick={() => setCurrentPage((prev) => prev + 1)}
+                  className="flex items-center gap-1 cursor-pointer"
+                >
+                  Next
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
       )}
 
       {/* Create Modal */}

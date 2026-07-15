@@ -68,11 +68,16 @@ export default function InternsListPage() {
     setCurrentPage(1);
   }, [searchTerm, statusFilter, missingDocsOnly, selectedSessionId]);
 
-  // Load saved session filter and sessions
+  // Load saved session filter, sessions, and status filter
   useEffect(() => {
-    const saved = localStorage.getItem('inotech_session_filter');
-    if (saved) {
-      setSelectedSessionId(saved);
+    const savedSession = localStorage.getItem('inotech_session_filter');
+    if (savedSession) {
+      setSelectedSessionId(savedSession);
+    }
+
+    const savedStatus = localStorage.getItem('inotech_status_filter');
+    if (savedStatus && ['all', 'pending_approval', 'declined', 'submitted'].includes(savedStatus)) {
+      setStatusFilter(savedStatus);
     }
 
     const loadSessions = async () => {
@@ -101,6 +106,11 @@ export default function InternsListPage() {
   const handleSessionFilterChange = (id: string) => {
     setSelectedSessionId(id);
     localStorage.setItem('inotech_session_filter', id);
+  };
+
+  const handleTabChange = (key: string) => {
+    setStatusFilter(key);
+    localStorage.setItem('inotech_status_filter', key);
   };
 
   // Filter & Search Logic
@@ -225,7 +235,7 @@ export default function InternsListPage() {
         {tabFilters.map((tab) => (
           <button
             key={tab.key}
-            onClick={() => setStatusFilter(tab.key)}
+            onClick={() => handleTabChange(tab.key)}
             className={`py-2 px-1 text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap ${
               statusFilter === tab.key
                 ? 'border-brand text-brand'

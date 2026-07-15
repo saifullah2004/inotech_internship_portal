@@ -4,7 +4,6 @@ import React, { useEffect, useState, useTransition, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   checkUserStatus,
-  createPendingRequest,
   submitInternshipDetails,
   uploadMissingDocument,
 } from '@/lib/actions/intern';
@@ -75,6 +74,9 @@ export default function UserDashboard() {
     status: string;
   } | null>(null);
 
+  const [noActiveSession, setNoActiveSession] = useState(false);
+  const [latestCompletedSessionName, setLatestCompletedSessionName] = useState<string | null>(null);
+
   // Fetch state on mount
   const fetchStatus = useCallback(async (showToast = false) => {
     const res = await checkUserStatus();
@@ -86,17 +88,11 @@ export default function UserDashboard() {
     setUser(res.user as DashboardUser | null);
     setDetails(res.internDetails as InternDetail | null);
     setSession(res.session as any);
+    setNoActiveSession(!!res.noActiveSession);
+    setLatestCompletedSessionName(res.latestCompletedSessionName || null);
 
     if (showToast) {
       toast.success('Status synchronized');
-    }
-
-    // Auto trigger pending request generation if not_submitted
-    if (res.user?.applicationStatus === 'not_submitted') {
-      const initReq = await createPendingRequest();
-      if (initReq.success && initReq.status) {
-        setUser((prev) => prev ? { ...prev, applicationStatus: initReq.status as string } : null);
-      }
     }
   }, [toast]);
 
@@ -117,6 +113,8 @@ export default function UserDashboard() {
           setUser(res.user as DashboardUser | null);
           setDetails(res.internDetails as InternDetail | null);
           setSession(res.session as any);
+          setNoActiveSession(!!res.noActiveSession);
+          setLatestCompletedSessionName(res.latestCompletedSessionName || null);
         }
       });
     }, 8000); // Check every 8 seconds
@@ -256,10 +254,7 @@ export default function UserDashboard() {
       if (res.error) {
         toast.error(res.error);
       } else {
-        toast.success('Your details have been uploaded successfully!');
-        if (res.missingDocs) {
-          toast.info(`Please remember to upload: ${res.missingDocs.join(', ')}`);
-        }
+        toast.success('Your details have been submitted! Waiting for admin approval.');
         fetchStatus();
       }
     });
@@ -330,7 +325,7 @@ export default function UserDashboard() {
       <main className="flex-1 max-w-4xl w-full mx-auto px-4 py-8 sm:px-6 lg:px-8">
         
         {/* Internship Session Information Card */}
-        {session && (user?.applicationStatus === 'submitted' || user?.applicationStatus === 'approved') && (
+        {session && (user?.applicationStatus === 'submitted' || user?.applicationStatus === 'approved' || user?.applicationStatus === 'not_submitted' || user?.applicationStatus === 'pending_approval') && (
           <Card className="mb-6 p-6 border border-brand/10 bg-brand/5 dark:bg-brand/10/30">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
               <div className="flex items-center gap-4">
@@ -383,8 +378,34 @@ export default function UserDashboard() {
           </Card>
         )}
         
-        {/* STATE 1: PENDING APPROVAL */}
-        {user?.applicationStatus === 'pending_approval' && (
+        {/* Scenario B: No Active Session exists and user hasn't submitted yet */}
+        {noActiveSession && user?.applicationStatus !== 'submitted' && user?.applicationStatus !== 'pending_approval' ? (
+          <div className="flex flex-col items-center justify-center py-12 text-center animate-fade-in">
+            <Card className="max-w-xl w-full p-8 flex flex-col items-center border border-neutral-100 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-md">
+              <div className="w-16 h-16 rounded-full bg-amber-50 dark:bg-amber-955/20 flex items-center justify-center mb-6">
+                <AlertTriangle className="w-8 h-8 text-amber-600 dark:text-amber-400" />
+              </div>
+              <h2 className="text-2xl font-bold tracking-tight mb-2 text-neutral-800 dark:text-neutral-100 font-sans">
+                Internship Registration Closed
+              </h2>
+              {latestCompletedSessionName && (
+                <p className="text-sm font-semibold text-neutral-550 dark:text-neutral-400 mb-2">
+                  The latest internship session &quot;{latestCompletedSessionName}&quot; has been completed.
+                </p>
+              )}
+              <p className="text-sm text-neutral-650 dark:text-neutral-450 mb-6 leading-relaxed max-w-md">
+                There is currently no active internship session. Please wait until the administrator creates a new internship session. Once a new session becomes active, you will be able to complete your profile and upload the required internship information.
+              </p>
+              <div className="flex items-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin text-neutral-400" />
+                <span className="text-xs text-neutral-400">Waiting for next cohort...</span>
+              </div>
+            </Card>
+          </div>
+        ) : (
+          <>
+            {/* STATE 1: PENDING APPROVAL — form submitted, awaiting admin decision */}
+            {user?.applicationStatus === 'pending_approval' && (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <Card className="max-w-md w-full p-8 flex flex-col items-center border border-amber-100 dark:border-amber-900/10">
               <div className="w-16 h-16 rounded-full bg-amber-50 dark:bg-amber-950/20 flex items-center justify-center mb-6">
@@ -393,7 +414,7 @@ export default function UserDashboard() {
               <h2 className="text-2xl font-bold tracking-tight mb-2">Request Submitted</h2>
               <Badge status="pending_approval" className="mb-4" />
               <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-6 leading-relaxed">
-                Your request has been submitted. Please wait for admin approval. This page auto-polls for updates, but you can also check status manually.
+                Your details have been submitted. Please wait while the admin reviews and approves your application. This page auto-polls for updates.
               </p>
               <Button
                 variant="primary"
@@ -470,7 +491,7 @@ export default function UserDashboard() {
             </Card>
 
             {/* Missing Documents Handler Widget */}
-            {details && (!details.recommendationLetterPath || !details.policeVerificationPath) && (
+            {!noActiveSession && details && (!details.recommendationLetterPath || !details.policeVerificationPath) && (
               <Card className="p-6 border border-amber-200 dark:border-amber-900/30 bg-amber-50/20 dark:bg-amber-950/10">
                 <div className="flex items-start gap-3 mb-4">
                   <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
@@ -556,13 +577,13 @@ export default function UserDashboard() {
           </div>
         )}
 
-        {/* STATE 4: APPROVED - SHOW INTERNSHIP DETAILS FORM */}
-        {user?.applicationStatus === 'approved' && (
+        {/* STATE 4: NOT_SUBMITTED or APPROVED — SHOW INTERNSHIP DETAILS FORM */}
+        {(user?.applicationStatus === 'not_submitted' || user?.applicationStatus === 'approved') && (
           <div className="space-y-6">
             <div className="flex flex-col gap-1.5 mb-2">
               <h2 className="text-2xl font-bold tracking-tight">Internship Registration</h2>
               <p className="text-sm text-neutral-500">
-                Congratulations on your approval. Please provide your academic details and documents to complete your onboarding.
+                Please fill in your academic details and upload the required documents to complete your internship application.
               </p>
             </div>
 
@@ -832,6 +853,8 @@ export default function UserDashboard() {
               </form>
             </Card>
           </div>
+        )}
+          </>
         )}
       </main>
 
