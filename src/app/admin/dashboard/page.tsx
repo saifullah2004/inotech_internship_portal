@@ -183,7 +183,7 @@ export default function AdminDashboard() {
           {statCards.map((card) => {
             const Icon = card.icon;
             return (
-              <LinkItem
+              <Link
                 key={card.title}
                 href="/admin/interns"
                 onClick={() => localStorage.setItem('inotech_status_filter', card.statusKey)}
@@ -205,7 +205,7 @@ export default function AdminDashboard() {
                   </div>
                   <p className="text-xs text-neutral-400 mt-4">{card.description}</p>
                 </Card>
-              </LinkItem>
+              </Link>
             );
           })}
         </div>
@@ -219,7 +219,7 @@ export default function AdminDashboard() {
             const Icon = card.icon;
             const isNameCard = card.key === 'active-session';
             return (
-              <LinkItem key={card.key} href={card.link} className="block cursor-pointer">
+              <Link key={card.key} href={card.link} className="block cursor-pointer">
                 <Card className="p-6 border border-neutral-100 dark:border-neutral-805 h-full">
                   <div className="flex justify-between items-start">
                     <div>
@@ -238,7 +238,7 @@ export default function AdminDashboard() {
                   </div>
                   <p className="text-xs text-neutral-400 mt-4">{card.description}</p>
                 </Card>
-              </LinkItem>
+              </Link>
             );
           })}
         </div>
