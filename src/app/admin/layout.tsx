@@ -44,13 +44,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* Sidebar navigation */}
       <aside
-        className={`fixed inset-y-0 left-0 w-64 bg-white dark:bg-neutral-900 border-r border-neutral-200 dark:border-neutral-800 z-50 flex flex-col justify-between transform transition-transform duration-200 lg:translate-x-0 lg:static ${
+        className={`fixed inset-y-0 left-0 w-64 bg-white dark:bg-neutral-900 border-r border-neutral-200 dark:border-neutral-800 z-50 flex flex-col justify-between transform transition-transform duration-200 lg:translate-x-0 lg:sticky lg:top-0 lg:h-screen ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="flex flex-col flex-1">
+        <div className="flex flex-col flex-1 min-h-0 overflow-y-auto">
           {/* Sidebar Header with Logo */}
-          <div className="h-16 border-b border-neutral-100 dark:border-neutral-850 px-6 flex items-center justify-between">
+          <div className="h-16 border-b border-neutral-100 dark:border-neutral-850 px-6 flex items-center justify-between shrink-0">
             <Logo href="/admin/dashboard" />
             <button
               onClick={() => setSidebarOpen(false)}

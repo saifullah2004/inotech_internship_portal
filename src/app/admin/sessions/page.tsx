@@ -217,7 +217,7 @@ export default function SessionsPage() {
           <Folder className="w-12 h-12 text-neutral-355 dark:text-neutral-750 mx-auto mb-3" />
           <h3 className="font-bold text-neutral-700 dark:text-neutral-300 mb-1 text-base">No Sessions Found</h3>
           <p className="text-xs text-neutral-500 max-w-sm mx-auto leading-relaxed">
-            There are no internship cohorts created yet. Click "Create New Session" to configure your first internship batch.
+            There are no internship cohorts created yet. Click &ldquo;Create New Session&rdquo; to configure your first internship batch.
           </p>
         </Card>
       ) : filteredSessions.length === 0 ? (
