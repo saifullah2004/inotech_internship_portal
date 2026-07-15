@@ -36,7 +36,12 @@ export default function RegisterPage() {
     const value = e.target.value;
     setEmail(value);
 
-    // Reset OTP verification states if they change email
+    // Clear form-level email error when user edits the field
+    if (errors.email) {
+      setErrors(prev => ({ ...prev, email: '' }));
+    }
+
+    // Reset OTP verification states if the user changes email
     if (otpSent || otpVerified) {
       setOtpSent(false);
       setOtpVerified(false);
@@ -49,6 +54,8 @@ export default function RegisterPage() {
   const handleSendOtp = async () => {
     setOtpError('');
     setOtpSuccess('');
+    // Clear the form-level email error (e.g. 'Email verification required') when user clicks Send OTP
+    setErrors(prev => ({ ...prev, email: '' }));
 
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -62,6 +69,10 @@ export default function RegisterPage() {
       const res = await sendRegisterOtpAction(email);
       if (res.error) {
         setOtpError(res.error);
+        // If server says cooldown active, show OTP panel so user sees the countdown
+        if (res.error.includes('Please wait')) {
+          setOtpSent(true);
+        }
       } else {
         setOtpSent(true);
         setOtpSuccess('Verification code sent successfully.');
@@ -200,7 +211,7 @@ export default function RegisterPage() {
             />
 
             <div className="space-y-2">
-              <div className="flex items-end gap-2">
+              <div className="flex items-start gap-2">
                 <div className="flex-1 relative">
                   <Input
                     label="Email Address"
@@ -221,24 +232,27 @@ export default function RegisterPage() {
                     </span>
                   )}
                 </div>
-                {!otpVerified && (
+                {!otpSent && !otpVerified && (
                   <Button
                     type="button"
                     variant="outline"
                     onClick={handleSendOtp}
-                    disabled={otpLoading || !email || cooldown > 0}
-                    className="h-10 shrink-0 px-4 text-xs font-semibold cursor-pointer border-brand text-brand hover:bg-brand/5"
+                    disabled={otpLoading || !email}
+                    className="h-10 mt-[22px] shrink-0 px-4 text-xs font-semibold cursor-pointer border-brand text-brand hover:bg-brand/5"
                   >
                     {otpLoading ? (
                       <Loader2 className="w-4 h-4 animate-spin text-brand" />
-                    ) : otpSent ? (
-                      cooldown > 0 ? `Resend in ${cooldown}s` : 'Resend OTP'
                     ) : (
                       'Send OTP'
                     )}
                   </Button>
                 )}
               </div>
+
+              {/* Always show send errors even before OTP panel is visible */}
+              {!otpSent && otpError && (
+                <p className="text-xs font-medium text-red-600 dark:text-red-400">{otpError}</p>
+              )}
 
               {otpSent && !otpVerified && (
                 <div className="p-4 rounded-lg bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 space-y-3">

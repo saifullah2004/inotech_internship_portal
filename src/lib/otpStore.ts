@@ -23,7 +23,7 @@ export function generateRegisterOtp(email: string): string {
   // Generate secure 6-digit OTP
   const otpVal = crypto.randomInt(100000, 999999).toString();
   const expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes
-  
+
   otpMap.set(email.toLowerCase(), {
     otp: otpVal,
     expiresAt,
@@ -31,7 +31,7 @@ export function generateRegisterOtp(email: string): string {
     verified: false,
     lastSentAt: Date.now(),
   });
-  
+
   return otpVal;
 }
 

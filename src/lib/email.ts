@@ -1,16 +1,19 @@
 import nodemailer from 'nodemailer';
 
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true, // true for port 465, false for other ports
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
+function createTransporter() {
+  return nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: (process.env.SMTP_PASS ?? '').replace(/\s/g, ''), // strip spaces from app password
+    },
+  });
+}
 
 export async function sendOtpEmail(toEmail: string, otp: string, userName: string) {
+  const transporter = createTransporter();
   const mailOptions = {
     from: `"Inotech Solutions" <${process.env.SMTP_USER}>`,
     to: toEmail,
@@ -48,10 +51,22 @@ export async function sendOtpEmail(toEmail: string, otp: string, userName: strin
 }
 
 export async function sendRegistrationOtpEmail(toEmail: string, otp: string) {
+  const transporter = createTransporter();
+
+  console.log('[OTP Email] Attempting to send OTP to:', toEmail);
+  console.log('[OTP Email] SMTP_USER:', process.env.SMTP_USER);
+  console.log('[OTP Email] SMTP_PASS set:', !!process.env.SMTP_PASS);
+
   const mailOptions = {
     from: `"Inotech Solutions" <${process.env.SMTP_USER}>`,
+    replyTo: process.env.SMTP_USER,
     to: toEmail,
-    subject: 'Email Verification',
+    subject: 'Email Verification - Inotech Internship Portal',
+    headers: {
+      'X-Priority': '1',
+      'X-Mailer': 'Inotech Portal Mailer',
+      'MIME-Version': '1.0',
+    },
     html: `
       <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e5e5e5; border-radius: 12px; background-color: #ffffff;">
         <div style="text-align: center; margin-bottom: 24px;">
@@ -81,6 +96,6 @@ export async function sendRegistrationOtpEmail(toEmail: string, otp: string) {
     `,
   };
 
-  await transporter.sendMail(mailOptions);
+  const info = await transporter.sendMail(mailOptions);
+  console.log('[OTP Email] Sent successfully. Message ID:', info.messageId);
 }
-

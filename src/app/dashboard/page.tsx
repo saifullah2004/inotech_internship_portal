@@ -87,7 +87,7 @@ export default function UserDashboard() {
     
     setUser(res.user as DashboardUser | null);
     setDetails(res.internDetails as InternDetail | null);
-    setSession(res.session as any);
+    setSession(res.session as typeof session);
     setNoActiveSession(!!res.noActiveSession);
     setLatestCompletedSessionName(res.latestCompletedSessionName || null);
 
@@ -112,7 +112,7 @@ export default function UserDashboard() {
           }
           setUser(res.user as DashboardUser | null);
           setDetails(res.internDetails as InternDetail | null);
-          setSession(res.session as any);
+          setSession(res.session as typeof session);
           setNoActiveSession(!!res.noActiveSession);
           setLatestCompletedSessionName(res.latestCompletedSessionName || null);
         }

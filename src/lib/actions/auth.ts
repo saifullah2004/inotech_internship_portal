@@ -6,6 +6,9 @@ import { db } from '@/lib/db';
 import { signJWT } from '@/lib/auth';
 import { loginSchema, registerSchema } from '@/lib/validations';
 import { autoUpdateSessionStatuses } from './session';
+import { sendRegistrationOtpEmail } from '@/lib/email';
+import { generateRegisterOtp, getOtpData, incrementOtpAttempts, setOtpVerified, invalidateOtp } from '@/lib/otpStore';
+import { z } from 'zod';
 
 export async function registerUser(prevState: unknown, formData: FormData) {
   try {
