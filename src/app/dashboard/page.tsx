@@ -85,7 +85,7 @@ export default function UserDashboard() {
     
     setUser(res.user as DashboardUser | null);
     setDetails(res.internDetails as InternDetail | null);
-    setSession(res.session as any);
+    setSession(res.session as typeof session);
 
     if (showToast) {
       toast.success('Status synchronized');
@@ -116,7 +116,7 @@ export default function UserDashboard() {
           }
           setUser(res.user as DashboardUser | null);
           setDetails(res.internDetails as InternDetail | null);
-          setSession(res.session as any);
+          setSession(res.session as typeof session);
         }
       });
     }, 8000); // Check every 8 seconds

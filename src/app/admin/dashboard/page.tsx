@@ -6,8 +6,8 @@ import { adminGetSessions } from '@/lib/actions/session';
 import { useToast } from '@/components/providers/ToastProvider';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import { Loader2, Users, CheckCircle, Clock, ArrowRight, Plus, Calendar, Folder } from 'lucide-react';
-import LinkItem from 'next/link';
+import Link from 'next/link';
+import { Loader2, Users, CheckCircle, Clock, Plus, Calendar, Folder } from 'lucide-react';
 
 export default function AdminDashboard() {
   const toast = useToast();
@@ -49,7 +49,7 @@ export default function AdminDashboard() {
       if (res.error) {
         toast.error(res.error);
       } else if (res.stats) {
-        setStats(res.stats as any);
+        setStats(res.stats as typeof stats);
       }
       setLoading(false);
     };
@@ -160,12 +160,12 @@ export default function AdminDashboard() {
             </select>
           </div>
 
-          <LinkItem href="/admin/interns/new">
+          <Link href="/admin/interns/new">
             <Button size="sm" className="flex items-center gap-1.5 cursor-pointer">
               <Plus className="w-4 h-4" />
               Add Intern Manually
             </Button>
-          </LinkItem>
+          </Link>
         </div>
       </div>
 
@@ -225,42 +225,7 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Quick Action Container */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="p-6 border border-neutral-100 dark:border-neutral-800 bg-white dark:bg-neutral-900 flex flex-col justify-between h-48">
-          <div>
-            <h3 className="font-bold text-neutral-800 dark:text-neutral-200 text-base">Intern Profiles</h3>
-            <p className="text-sm text-neutral-400 mt-2">
-              View, search, filter, and modify details of all registered candidates and active interns.
-            </p>
-          </div>
-          <div className="mt-4">
-            <LinkItem href="/admin/interns" className="inline-block">
-              <Button variant="outline" size="sm" className="flex items-center gap-1.5 group cursor-pointer">
-                <span>Manage Interns</span>
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-              </Button>
-            </LinkItem>
-          </div>
-        </Card>
 
-        <Card className="p-6 border border-neutral-100 dark:border-neutral-800 bg-white dark:bg-neutral-900 flex flex-col justify-between h-48">
-          <div>
-            <h3 className="font-bold text-neutral-800 dark:text-neutral-200 text-base">Admin Credentials</h3>
-            <p className="text-sm text-neutral-400 mt-2">
-              Ensure portal security by periodically modifying your administrator dashboard entry password.
-            </p>
-          </div>
-          <div className="mt-4">
-            <LinkItem href="/admin/profile" className="inline-block">
-              <Button variant="outline" size="sm" className="flex items-center gap-1.5 group cursor-pointer">
-                <span>Edit Profile Password</span>
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-              </Button>
-            </LinkItem>
-          </div>
-        </Card>
-      </div>
     </div>
   );
 }

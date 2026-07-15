@@ -72,7 +72,7 @@ export default function InternDetailsPage({ params }: PageProps) {
       toast.error(res.error);
       router.push('/admin/interns');
     } else if (res.intern) {
-      setUser(res.intern as any);
+      setUser(res.intern as typeof user);
       setDetails(res.intern.internDetails);
     }
     setLoading(false);

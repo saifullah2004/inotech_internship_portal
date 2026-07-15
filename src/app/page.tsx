@@ -110,7 +110,7 @@ export default function RootPage() {
                     <Award className="w-3.5 h-3.5" />
                     <span>About Inotech Solutions</span>
                   </div>
-                  <p className="text-slate-600 leading-relaxed text-sm">
+                  <p className="text-slate-600 leading-relaxed text-sm text-justify">
                     Welcome to Inotech Solutions Pvt Ltd, One of the few IT system integration, professional service and software companies in South Asia that works with Enterprise system and companies. As a privately owned company, Inotech Solutions provides IT Consultancy, software design and development as well as professional services and hardware deployment and maintenance to the Government, Semi Government, Defense, and Private Sectors, ERP Solutions, Data Centre Management and cloud computing, Cyber Security, Health Care with State of the art HMIS software, eLearning, eEnrollment and eExam etc.
                   </p>
                 </div>
@@ -123,8 +123,8 @@ export default function RootPage() {
                     <BookOpen className="w-3.5 h-3.5" />
                     <span>About the Internship Documentation Portal</span>
                   </div>
-                  <p className="text-slate-650 leading-relaxed text-sm">
-                    The Internship Documentation Portal is designed to streamline and manage the intern onboarding and documentation process efficiently. It provides a centralized platform for interns to submit their necessary documents and for administrators to review, verify, approve, or reject these submissions seamlessly. The system ensures that all required documentation is collected and processed accurately, facilitating smooth batch allocation and a well-organized internship management workflow.
+                  <p className="text-slate-650 leading-relaxed text-sm text-justify">
+                    The Internship Documentation Portal is designed to streamline and manage the intern onboarding and documentation process efficiently. It provides a platform for interns to submit their necessary documents and for administrators to review, verify, approve, or reject these submissions seamlessly. The system ensures that all required documentation is collected and processed accurately, facilitating smooth batch allocation and a well-organized internship management workflow.
                   </p>
                 </div>
               </div>
@@ -145,7 +145,7 @@ export default function RootPage() {
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-slate-900 mb-2">Our Mission</h3>
-                  <p className="text-slate-600 leading-relaxed text-sm">
+                  <p className="text-slate-600 leading-relaxed text-sm text-justify">
                     To deliver premium-quality, secure, and robust technology solutions while nurturing next-generation developer talent. We aim to establish a pathway for interns to learn best engineering practices and successfully transition into professional software roles.
                   </p>
                 </div>
@@ -158,7 +158,7 @@ export default function RootPage() {
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-slate-900 mb-2">Our Vision</h3>
-                  <p className="text-slate-600 leading-relaxed text-sm">
+                  <p className="text-slate-600 leading-relaxed text-sm text-justify">
                     To be a leading center of technological excellence and software innovation, recognized globally for producing world-class tech products and mentoring outstanding engineering professionals who drive the digital future.
                   </p>
                 </div>
@@ -187,7 +187,7 @@ export default function RootPage() {
                     <Users className="w-6 h-6" />
                   </div>
                   <h3 className="text-lg font-bold text-slate-900">Intern Documentation Management</h3>
-                  <p className="text-sm text-slate-600 leading-relaxed">
+                  <p className="text-sm text-slate-600 leading-relaxed text-justify">
                     Manage and upload all required internship documents, including CV, CNIC, cover letter, and verification certificates, through a secure and user-friendly portal. Track the status of submitted documents in real time.
                   </p>
                 </div>
@@ -200,7 +200,7 @@ export default function RootPage() {
                     <BookOpen className="w-6 h-6" />
                   </div>
                   <h3 className="text-lg font-bold text-slate-900">Internship Registration</h3>
-                  <p className="text-sm text-slate-600 leading-relaxed">
+                  <p className="text-sm text-slate-600 leading-relaxed text-justify">
                     Register for the internship by completing the online application and submitting the required documents. Once verified by the administrator, approved interns are assigned to their respective internship batches.
                   </p>
                 </div>
