@@ -556,7 +556,7 @@ export default function SessionsPage() {
             </p>
             {selectedSession.totalInterns > 0 && (
               <div className="p-3 bg-rose-50 border border-rose-100 text-rose-700 rounded-lg text-xs font-medium">
-                Warning: There are {selectedSession.totalInterns} intern(s) assigned to this session. Database constraints restrict deleting sessions with active assignments. You should edit this session and set its status to Completed (Archived) instead.
+                Warning: There are {selectedSession.totalInterns} intern(s) assigned to this session. Deleting this session will permanently delete all these interns along with all their profiles, details, request files, and database records. This action cannot be undone.
               </div>
             )}
 
@@ -575,7 +575,6 @@ export default function SessionsPage() {
                 type="button"
                 onClick={handleDeleteConfirm}
                 isLoading={deletePending}
-                disabled={selectedSession.totalInterns > 0}
                 className="bg-rose-600 hover:bg-rose-700 text-white"
               >
                 Delete Session

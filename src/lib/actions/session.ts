@@ -3,6 +3,8 @@
 import { cookies } from 'next/headers';
 import { db } from '@/lib/db';
 import { verifyJWT } from '@/lib/auth';
+import { promises as fs } from 'fs';
+import path from 'path';
 
 // Helper to authenticate admin
 async function getAdminUser() {
@@ -280,18 +282,34 @@ export async function adminDeleteSession(id: number) {
     // Automatically update statuses first
     await autoUpdateSessionStatuses();
 
-    // Check if there are any users (interns) assigned to this session
-    const internsCount = await db.user.count({
+    // Find all users (interns) assigned to this session
+    const interns = await db.user.findMany({
       where: {
         sessionId: id,
-        role: 'user',
+      },
+      select: {
+        id: true,
       },
     });
 
-    if (internsCount > 0) {
-      return { error: 'Cannot delete this session because interns are assigned to it. Try archiving it as "Completed" instead.' };
+    // Delete filesystem uploads folder for each intern
+    for (const intern of interns) {
+      const uploadsDir = path.join(process.cwd(), 'public', 'uploads', String(intern.id));
+      try {
+        await fs.rm(uploadsDir, { recursive: true, force: true });
+      } catch (e) {
+        console.error(`Failed to clean up uploads directory for user ${intern.id}:`, e);
+      }
     }
 
+    // Delete all users in this session (cascade deletes their details and requests)
+    await db.user.deleteMany({
+      where: {
+        sessionId: id,
+      },
+    });
+
+    // Now delete the session
     await db.internshipSession.delete({
       where: { id },
     });
