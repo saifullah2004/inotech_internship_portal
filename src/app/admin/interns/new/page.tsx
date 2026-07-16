@@ -137,7 +137,7 @@ export default function AddInternManuallyPage() {
         <form onSubmit={handleSubmit} className="space-y-8" noValidate>
           {/* Session Assignment */}
           <div>
-            <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-400 mb-4 pb-1.5 border-b border-neutral-100 dark:border-neutral-800">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-black dark:text-white mb-4 pb-1.5 border-b border-neutral-100 dark:border-neutral-800">
               Session Assignment
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -173,7 +173,7 @@ export default function AddInternManuallyPage() {
 
           {/* Personal Info */}
           <div>
-            <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-400 mb-4 pb-1.5 border-b border-neutral-100 dark:border-neutral-800">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-black dark:text-white mb-4 pb-1.5 border-b border-neutral-100 dark:border-neutral-800">
               Personal Information
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -226,7 +226,7 @@ export default function AddInternManuallyPage() {
 
           {/* Academic Info */}
           <div>
-            <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-400 mb-4 pb-1.5 border-b border-neutral-100 dark:border-neutral-800">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-black dark:text-white mb-4 pb-1.5 border-b border-neutral-100 dark:border-neutral-800">
               Academic Details
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -279,7 +279,7 @@ export default function AddInternManuallyPage() {
 
           {/* Documents */}
           <div>
-            <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-400 mb-4 pb-1.5 border-b border-neutral-100 dark:border-neutral-800">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-black dark:text-white mb-4 pb-1.5 border-b border-neutral-100 dark:border-neutral-800">
               Upload Files
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">

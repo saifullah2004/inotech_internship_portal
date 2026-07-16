@@ -244,11 +244,11 @@ export default function SessionsPage() {
 
                   {/* Session Name & Code */}
                   <div>
-                    <h3 className="text-lg font-bold text-neutral-800 dark:text-neutral-100 leading-snug">
+                    <h3 className="text-lg font-bold text-black dark:text-white leading-snug">
                       {session.sessionName}
                     </h3>
                     {session.sessionCode && (
-                      <span className="inline-block text-xs font-semibold px-2 py-0.5 bg-neutral-150 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 rounded-md mt-1">
+                      <span className="inline-block text-xs font-semibold px-2 py-0.5 bg-neutral-150 dark:bg-neutral-800 text-black dark:text-white rounded-md mt-1">
                         {session.sessionCode}
                       </span>
                     )}
@@ -256,11 +256,11 @@ export default function SessionsPage() {
 
                   {/* Description */}
                   {session.description ? (
-                    <p className="text-sm text-neutral-500 dark:text-neutral-450 line-clamp-2 leading-relaxed">
+                    <p className="text-sm text-black dark:text-white line-clamp-2 leading-relaxed">
                       {session.description}
                     </p>
                   ) : (
-                    <p className="text-sm text-neutral-400 dark:text-neutral-600 italic">
+                    <p className="text-sm text-black dark:text-white italic">
                       No description provided.
                     </p>
                   )}
@@ -268,21 +268,21 @@ export default function SessionsPage() {
                   {/* Timeline & Interns Counts */}
                   <div className="border-t border-neutral-100 dark:border-neutral-800 pt-4 space-y-3">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-neutral-400 flex items-center gap-1.5">
+                      <span className="text-black dark:text-white flex items-center gap-1.5 font-bold">
                         <Clock className="w-3.5 h-3.5" />
                         Timeline
                       </span>
-                      <span className="font-semibold text-neutral-700 dark:text-neutral-300">
+                      <span className="font-semibold text-black dark:text-white">
                         {new Date(session.startDate).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })} - {new Date(session.endDate).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
                       </span>
                     </div>
 
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-neutral-400 flex items-center gap-1.5">
+                      <span className="text-black dark:text-white flex items-center gap-1.5 font-bold">
                         <Users className="w-3.5 h-3.5" />
                         Total Interns
                       </span>
-                      <span className="font-bold text-neutral-800 dark:text-neutral-200">
+                      <span className="font-bold text-black dark:text-white">
                         {session.totalInterns}
                       </span>
                     </div>

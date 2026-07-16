@@ -472,6 +472,7 @@ export async function adminGetDashboardStats(selectedSessionId?: number) {
         totalSessions,
         completedSessions,
         activeSessionName: activeSession ? activeSession.sessionName : 'None',
+        activeSessionId: activeSession ? activeSession.id : null,
         activeSessionInternsCount,
       },
     };
@@ -678,6 +679,7 @@ export async function adminUpdateInternDetails(userId: number, formData: FormDat
       db.user.update({
         where: { id: userId },
         data: {
+          name: fullName,
           sessionId,
         },
       }),
@@ -909,5 +911,31 @@ export async function adminGetInternById(id: number) {
   } catch (error) {
     console.error('Get intern by id error:', error);
     return { error: 'Failed to fetch intern profile' };
+  }
+}
+
+// Admin Action: Delete intern permanently from database
+export async function adminDeleteIntern(userId: number) {
+  const sessionUser = await getSessionUser();
+  if (!sessionUser || sessionUser.role !== 'admin') return { error: 'Unauthorized' };
+
+  try {
+    // Delete user (Prisma onDelete: Cascade will take care of related detail and requests)
+    await db.user.delete({
+      where: { id: userId },
+    });
+
+    // Delete uploads directory if it exists
+    const uploadsDir = path.join(process.cwd(), 'public', 'uploads', String(userId));
+    try {
+      await fs.rm(uploadsDir, { recursive: true, force: true });
+    } catch (e) {
+      console.error('Failed to clean up uploads directory:', e);
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('Delete intern error:', error);
+    return { error: 'Failed to delete intern' };
   }
 }

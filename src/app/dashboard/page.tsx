@@ -304,7 +304,7 @@ export default function UserDashboard() {
           <Logo href="/dashboard" />
           <div className="flex items-center gap-4">
             <div className="hidden md:flex flex-col items-end text-right">
-              <span className="text-sm font-semibold text-neutral-800 dark:text-neutral-200">{user?.name}</span>
+              <span className="text-sm font-semibold text-neutral-800 dark:text-neutral-200">{details?.fullName || user?.name}</span>
               <span className="text-xs text-neutral-400">Intern</span>
             </div>
             <Button
@@ -333,10 +333,10 @@ export default function UserDashboard() {
                   <Calendar className="w-6 h-6" />
                 </div>
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-450 block">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-black dark:text-white block">
                     Internship Session
                   </span>
-                  <h3 className="text-lg font-bold text-neutral-800 dark:text-neutral-100 mt-0.5">
+                  <h3 className="text-lg font-bold text-black dark:text-white mt-0.5">
                     {session.sessionName}
                   </h3>
                 </div>
@@ -344,10 +344,10 @@ export default function UserDashboard() {
 
               <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-sm">
                 <div>
-                  <span className="text-neutral-405 block uppercase tracking-wider font-bold text-[9px]">
+                  <span className="text-black dark:text-white block uppercase tracking-wider font-bold text-[9px]">
                     Start Date
                   </span>
-                  <span className="font-semibold text-neutral-700 dark:text-neutral-350">
+                  <span className="font-semibold text-black dark:text-white">
                     {new Date(session.startDate).toLocaleDateString(undefined, {
                       day: 'numeric',
                       month: 'long',
@@ -356,10 +356,10 @@ export default function UserDashboard() {
                   </span>
                 </div>
                 <div>
-                  <span className="text-neutral-405 block uppercase tracking-wider font-bold text-[9px]">
+                  <span className="text-black dark:text-white block uppercase tracking-wider font-bold text-[9px]">
                     End Date
                   </span>
-                  <span className="font-semibold text-neutral-700 dark:text-neutral-350">
+                  <span className="font-semibold text-black dark:text-white">
                     {new Date(session.endDate).toLocaleDateString(undefined, {
                       day: 'numeric',
                       month: 'long',
@@ -368,7 +368,7 @@ export default function UserDashboard() {
                   </span>
                 </div>
                 <div>
-                  <span className="text-neutral-405 block uppercase tracking-wider font-bold text-[9px] mb-0.5">
+                  <span className="text-black dark:text-white block uppercase tracking-wider font-bold text-[9px] mb-0.5">
                     Status
                   </span>
                   <Badge status={session.status} className="mt-0.5" />
@@ -457,8 +457,8 @@ export default function UserDashboard() {
                   <CheckCircle2 className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold tracking-tight">Details Uploaded Successfully</h2>
-                  <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                  <h2 className="text-2xl font-bold tracking-tight text-black dark:text-white">Details Uploaded Successfully</h2>
+                  <p className="text-sm text-black dark:text-white">
                     You have already uploaded your details. Thank you!
                   </p>
                 </div>
@@ -467,23 +467,23 @@ export default function UserDashboard() {
               {/* Submitted Details Overview */}
               {details && (
                 <div className="border-t border-neutral-100 dark:border-neutral-800 pt-6">
-                  <h3 className="text-sm font-semibold uppercase tracking-wider text-neutral-400 mb-4">Your Application Summary</h3>
+                  <h3 className="text-sm font-semibold uppercase tracking-wider text-black dark:text-white mb-4">Your Application Summary</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                     <div>
-                      <span className="text-neutral-400 block">Full Name</span>
-                      <span className="font-medium">{details.fullName}</span>
+                      <span className="text-black dark:text-white font-bold block">Full Name</span>
+                      <span className="font-medium text-black dark:text-white">{details.fullName}</span>
                     </div>
                     <div>
-                      <span className="text-neutral-400 block">University</span>
-                      <span className="font-medium">{details.university}</span>
+                      <span className="text-black dark:text-white font-bold block">University</span>
+                      <span className="font-medium text-black dark:text-white">{details.university}</span>
                     </div>
                     <div>
-                      <span className="text-neutral-400 block">Department</span>
-                      <span className="font-medium">{details.department}</span>
+                      <span className="text-black dark:text-white font-bold block">Department</span>
+                      <span className="font-medium text-black dark:text-white">{details.department}</span>
                     </div>
                     <div>
-                      <span className="text-neutral-400 block">Starting Date</span>
-                      <span className="font-medium">{new Date(details.startDate).toLocaleDateString()}</span>
+                      <span className="text-black dark:text-white font-bold block">Starting Date</span>
+                      <span className="font-medium text-black dark:text-white">{new Date(details.startDate).toLocaleDateString()}</span>
                     </div>
                   </div>
                 </div>

@@ -211,26 +211,26 @@ export default function InternDetailsPage({ params }: PageProps) {
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={details.picturePath}
-                  alt={user.name}
+                  alt={details?.fullName || user.name}
                   className="w-full h-full object-cover"
                 />
               </div>
             ) : (
               <div className="w-16 h-16 rounded-full bg-brand/10 text-brand flex items-center justify-center font-bold text-xl shrink-0">
-                {user.name.charAt(0)}
+                {(details?.fullName || user.name).charAt(0)}
               </div>
             )}
             <div>
-              <h2 className="text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50">
-                {user.name}
+              <h2 className="text-2xl font-bold tracking-tight text-black dark:text-white">
+                {details?.fullName || user.name}
               </h2>
-              <span className="text-sm text-neutral-400 block mt-0.5">{user.email}</span>
+              <span className="text-sm text-black dark:text-white block mt-0.5">{user.email}</span>
             </div>
           </div>
 
           <div className="flex flex-col items-start md:items-end gap-2.5">
             <div className="flex items-center gap-2">
-              <span className="text-xs text-neutral-400">Application Status:</span>
+              <span className="text-xs text-black dark:text-white font-bold">Application Status:</span>
               <Badge status={user.applicationStatus} />
             </div>
             
@@ -269,7 +269,7 @@ export default function InternDetailsPage({ params }: PageProps) {
               {/* Personal Details Row */}
               <div>
                 <div className="flex items-center justify-between mb-4 border-b border-neutral-100 dark:border-neutral-800 pb-2">
-                  <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-400 flex items-center gap-1.5">
+                  <h3 className="text-sm font-bold uppercase tracking-wider text-black dark:text-white flex items-center gap-1.5">
                     <User className="w-4 h-4 text-brand" />
                     Personal &amp; Contact Info
                   </h3>
@@ -285,32 +285,32 @@ export default function InternDetailsPage({ params }: PageProps) {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5 text-sm">
                   <div>
-                    <span className="text-neutral-400 block">Father&apos;s Name</span>
-                    <span className="font-semibold text-neutral-800 dark:text-neutral-200">
+                    <span className="text-black dark:text-white font-bold block">Father&apos;s Name</span>
+                    <span className="font-semibold text-black dark:text-white">
                       {details.fatherName}
                     </span>
                   </div>
                   <div>
-                    <span className="text-neutral-400 block flex items-center gap-1">
+                    <span className="text-black dark:text-white font-bold block flex items-center gap-1">
                       <Phone className="w-3.5 h-3.5" />
                       Phone Number
                     </span>
-                    <span className="font-semibold text-neutral-800 dark:text-neutral-200">
+                    <span className="font-semibold text-black dark:text-white">
                       {details.phone}
                     </span>
                   </div>
                   <div>
-                    <span className="text-neutral-400 block">Assigned Session</span>
+                    <span className="text-black dark:text-white font-bold block">Assigned Session</span>
                     <span className="font-semibold text-brand block mt-0.5">
-                      {user.session ? user.session.sessionName : <span className="text-neutral-450 italic font-normal">None Assigned</span>}
+                      {user.session ? user.session.sessionName : <span className="text-black dark:text-white italic font-normal">None Assigned</span>}
                     </span>
                   </div>
                   <div className="md:col-span-3">
-                    <span className="text-neutral-400 block flex items-center gap-1">
+                    <span className="text-black dark:text-white font-bold block flex items-center gap-1">
                       <MapPin className="w-3.5 h-3.5" />
                       Address
                     </span>
-                    <span className="font-semibold text-neutral-800 dark:text-neutral-200 leading-relaxed">
+                    <span className="font-semibold text-black dark:text-white leading-relaxed">
                       {details.address}
                     </span>
                   </div>
@@ -319,41 +319,41 @@ export default function InternDetailsPage({ params }: PageProps) {
 
               {/* Academic Details Row */}
               <div>
-                <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-400 mb-4 pb-2 border-b border-neutral-100 dark:border-neutral-800 flex items-center gap-1.5">
+                <h3 className="text-sm font-bold uppercase tracking-wider text-black dark:text-white mb-4 pb-2 border-b border-neutral-100 dark:border-neutral-800 flex items-center gap-1.5">
                   <GraduationCap className="w-4 h-4 text-brand" />
                   Academic History
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5 text-sm">
                   <div>
-                    <span className="text-neutral-400 block">University</span>
-                    <span className="font-semibold text-neutral-800 dark:text-neutral-200">
+                    <span className="text-black dark:text-white font-bold block">University</span>
+                    <span className="font-semibold text-black dark:text-white">
                       {details.university}
                     </span>
                   </div>
                   <div>
-                    <span className="text-neutral-400 block">Department</span>
-                    <span className="font-semibold text-neutral-800 dark:text-neutral-200">
+                    <span className="text-black dark:text-white font-bold block">Department</span>
+                    <span className="font-semibold text-black dark:text-white">
                       {details.department}
                     </span>
                   </div>
                   <div>
-                    <span className="text-neutral-400 block">Semester</span>
-                    <span className="font-semibold text-neutral-800 dark:text-neutral-200">
+                    <span className="text-black dark:text-white font-bold block">Semester</span>
+                    <span className="font-semibold text-black dark:text-white">
                       {details.semester}
                     </span>
                   </div>
                   <div>
-                    <span className="text-neutral-400 block">CGPA</span>
+                    <span className="text-black dark:text-white font-bold block">CGPA</span>
                     <span className="font-semibold text-brand text-base">
                       {details.cgpa.toFixed(2)} / 4.00
                     </span>
                   </div>
                   <div>
-                    <span className="text-neutral-400 block flex items-center gap-1">
+                    <span className="text-black dark:text-white font-bold block flex items-center gap-1">
                       <Calendar className="w-3.5 h-3.5" />
                       Requested Start Date
                     </span>
-                    <span className="font-semibold text-neutral-800 dark:text-neutral-200">
+                    <span className="font-semibold text-black dark:text-white">
                       {new Date(details.startDate).toLocaleDateString(undefined, {
                         year: 'numeric',
                         month: 'long',
@@ -366,7 +366,7 @@ export default function InternDetailsPage({ params }: PageProps) {
 
               {/* Uploaded Documents Grid */}
               <div>
-                <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-400 mb-4 pb-2 border-b border-neutral-100 dark:border-neutral-800 flex items-center gap-1.5">
+                <h3 className="text-sm font-bold uppercase tracking-wider text-black dark:text-white mb-4 pb-2 border-b border-neutral-100 dark:border-neutral-800 flex items-center gap-1.5">
                   <FileText className="w-4 h-4 text-brand" />
                   Uploaded Documents
                 </h3>
@@ -375,8 +375,8 @@ export default function InternDetailsPage({ params }: PageProps) {
                   {/* Picture */}
                   <div className="p-4 rounded-lg bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 flex flex-col justify-between h-40">
                     <div>
-                      <span className="text-xs font-bold text-neutral-400 block uppercase tracking-wider">Profile Picture</span>
-                      <span className="text-xs text-neutral-500 mt-0.5 block truncate">{details.picturePath}</span>
+                      <span className="text-xs font-bold text-black dark:text-white block uppercase tracking-wider">Profile Picture</span>
+                      <span className="text-xs text-black dark:text-white mt-0.5 block truncate">{details.picturePath}</span>
                     </div>
                     <div className="flex items-center gap-2 mt-4 pt-2 border-t border-neutral-50 dark:border-neutral-850">
                       <a href={details.picturePath} target="_blank" rel="noopener noreferrer" className="flex-1">
@@ -391,8 +391,8 @@ export default function InternDetailsPage({ params }: PageProps) {
                   {/* CV */}
                   <div className="p-4 rounded-lg bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 flex flex-col justify-between h-40">
                     <div>
-                      <span className="text-xs font-bold text-neutral-400 block uppercase tracking-wider">Curriculum Vitae (CV)</span>
-                      <span className="text-xs text-neutral-500 mt-0.5 block truncate">{details.cvPath}</span>
+                      <span className="text-xs font-bold text-black dark:text-white block uppercase tracking-wider">Curriculum Vitae (CV)</span>
+                      <span className="text-xs text-black dark:text-white mt-0.5 block truncate">{details.cvPath}</span>
                     </div>
                     <div className="flex items-center gap-2 mt-4 pt-2 border-t border-neutral-50 dark:border-neutral-850">
                       <a href={details.cvPath} target="_blank" rel="noopener noreferrer" className="flex-1">
@@ -407,8 +407,8 @@ export default function InternDetailsPage({ params }: PageProps) {
                   {/* CNIC */}
                   <div className="p-4 rounded-lg bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 flex flex-col justify-between h-40">
                     <div>
-                      <span className="text-xs font-bold text-neutral-400 block uppercase tracking-wider">CNIC Copy</span>
-                      <span className="text-xs text-neutral-500 mt-0.5 block truncate">{details.cnicPath}</span>
+                      <span className="text-xs font-bold text-black dark:text-white block uppercase tracking-wider">CNIC Copy</span>
+                      <span className="text-xs text-black dark:text-white mt-0.5 block truncate">{details.cnicPath}</span>
                     </div>
                     <div className="flex items-center gap-2 mt-4 pt-2 border-t border-neutral-50 dark:border-neutral-850">
                       <a href={details.cnicPath} target="_blank" rel="noopener noreferrer" className="flex-1">
@@ -424,14 +424,14 @@ export default function InternDetailsPage({ params }: PageProps) {
                   <div className="p-4 rounded-lg bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 flex flex-col justify-between h-40">
                     <div>
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-neutral-400 block uppercase tracking-wider">Rec. Letter</span>
+                        <span className="text-xs font-bold text-black dark:text-white block uppercase tracking-wider">Rec. Letter</span>
                         {missingLetter ? (
                           <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">Missing</span>
                         ) : (
                           <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Uploaded</span>
                         )}
                       </div>
-                      <span className="text-xs text-neutral-500 mt-0.5 block truncate">
+                      <span className="text-xs text-black dark:text-white mt-0.5 block truncate">
                         {missingLetter ? 'Not submitted by candidate' : details.recommendationLetterPath}
                       </span>
                     </div>
@@ -455,14 +455,14 @@ export default function InternDetailsPage({ params }: PageProps) {
                   <div className="p-4 rounded-lg bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 flex flex-col justify-between h-40 sm:col-span-2">
                     <div>
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-neutral-400 block uppercase tracking-wider">Police Verification Cert</span>
+                        <span className="text-xs font-bold text-black dark:text-white block uppercase tracking-wider">Police Verification Cert</span>
                         {missingVerification ? (
                           <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">Missing</span>
                         ) : (
                           <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Uploaded</span>
                         )}
                       </div>
-                      <span className="text-xs text-neutral-500 mt-0.5 block truncate">
+                      <span className="text-xs text-black dark:text-white mt-0.5 block truncate">
                         {missingVerification ? 'Not submitted by candidate' : details.policeVerificationPath}
                       </span>
                     </div>

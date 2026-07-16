@@ -21,6 +21,7 @@ export default function AdminDashboard() {
     totalSessions: 0,
     completedSessions: 0,
     activeSessionName: 'None',
+    activeSessionId: null as number | null,
     activeSessionInternsCount: 0,
   });
 
@@ -93,7 +94,7 @@ export default function AdminDashboard() {
       value: stats.pendingRequests,
       description: selectedSessionId === 'all' ? 'Awaiting initial approval' : 'Pending requests in selected session',
       icon: Clock,
-      color: 'text-amber-600 bg-amber-50 dark:bg-amber-950/20',
+      color: 'text-amber-600 bg-amber-50 dark:bg-amber-955/20',
       statusKey: 'pending_approval',
     },
   ];
@@ -106,7 +107,7 @@ export default function AdminDashboard() {
       description: 'Currently running batch',
       icon: Calendar,
       color: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-950/20',
-      link: '/admin/sessions',
+      link: '/admin/interns',
     },
     {
       key: 'interns-active',
@@ -178,7 +179,7 @@ export default function AdminDashboard() {
 
       {/* Main Counters Grid */}
       <div className="space-y-2">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-400">Intern Statistics</h3>
+        <h3 className="text-xs font-bold uppercase tracking-wider text-black dark:text-white">Intern Statistics</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {statCards.map((card) => {
             const Icon = card.icon;
@@ -192,10 +193,10 @@ export default function AdminDashboard() {
                 <Card className="p-6 border border-neutral-100 dark:border-neutral-800 h-full">
                   <div className="flex justify-between items-start">
                     <div>
-                      <span className="text-xs font-bold uppercase tracking-wider text-neutral-400">
+                      <span className="text-xs font-bold uppercase tracking-wider text-black dark:text-white">
                         {card.title}
                       </span>
-                      <span className="text-3xl font-extrabold block mt-2 text-neutral-800 dark:text-neutral-50">
+                      <span className="text-3xl font-extrabold block mt-2 text-black dark:text-white">
                         {card.value}
                       </span>
                     </div>
@@ -203,7 +204,7 @@ export default function AdminDashboard() {
                       <Icon className="w-5 h-5" />
                     </div>
                   </div>
-                  <p className="text-xs text-neutral-400 mt-4">{card.description}</p>
+                  <p className="text-xs text-black dark:text-white mt-4">{card.description}</p>
                 </Card>
               </Link>
             );
@@ -213,22 +214,33 @@ export default function AdminDashboard() {
 
       {/* Session Cohorts statistics */}
       <div className="space-y-2">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-400">Session Cohorts Overview</h3>
+        <h3 className="text-xs font-bold uppercase tracking-wider text-black dark:text-white">Session Cohorts Overview</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {sessionStatCards.map((card) => {
             const Icon = card.icon;
             const isNameCard = card.key === 'active-session';
             return (
-              <Link key={card.key} href={card.link} className="block cursor-pointer">
+              <Link
+                key={card.key}
+                href={card.link}
+                onClick={() => {
+                  if (card.key === 'active-session' || card.key === 'interns-active') {
+                    if (stats.activeSessionId) {
+                      localStorage.setItem('inotech_session_filter', String(stats.activeSessionId));
+                    }
+                  }
+                }}
+                className="block cursor-pointer"
+              >
                 <Card className="p-6 border border-neutral-100 dark:border-neutral-805 h-full">
                   <div className="flex justify-between items-start">
                     <div>
-                      <span className="text-xs font-bold uppercase tracking-wider text-neutral-400">
+                      <span className="text-xs font-bold uppercase tracking-wider text-black dark:text-white">
                         {card.title}
                       </span>
                       <span className={`${
                         isNameCard ? 'text-xs sm:text-sm font-bold mt-2.5' : 'text-base sm:text-lg font-extrabold mt-2'
-                      } block text-neutral-800 dark:text-neutral-50 break-words leading-snug`} title={String(card.value)}>
+                      } block text-black dark:text-white break-words leading-snug`} title={String(card.value)}>
                         {card.value}
                       </span>
                     </div>
@@ -236,7 +248,7 @@ export default function AdminDashboard() {
                       <Icon className="w-4 h-4" />
                     </div>
                   </div>
-                  <p className="text-xs text-neutral-400 mt-4">{card.description}</p>
+                  <p className="text-xs text-black dark:text-white mt-4">{card.description}</p>
                 </Card>
               </Link>
             );

@@ -66,8 +66,8 @@ export default function AdminProfilePage() {
               <KeyRound className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-bold text-neutral-800 dark:text-neutral-200">Change Password</h3>
-              <p className="text-xs text-neutral-400">Keep your administrator credentials secure.</p>
+              <h3 className="font-bold text-black dark:text-white">Change Password</h3>
+              <p className="text-xs text-black dark:text-white">Keep your administrator credentials secure.</p>
             </div>
           </div>
 

@@ -1,14 +1,15 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useTransition } from 'react';
 import Link from 'next/link';
-import { adminGetInterns, adminDecideRequest } from '@/lib/actions/intern';
+import { adminGetInterns, adminDecideRequest, adminDeleteIntern } from '@/lib/actions/intern';
 import { adminGetSessions } from '@/lib/actions/session';
 import { useToast } from '@/components/providers/ToastProvider';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
-import { Loader2, Search, FileWarning, Eye, UserPlus, CheckCircle, XCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import Modal from '@/components/ui/Modal';
+import { Loader2, Search, FileWarning, Eye, UserPlus, CheckCircle, XCircle, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
 
 interface AdminInternListItem {
   id: number;
@@ -54,6 +55,35 @@ export default function InternsListPage() {
     }
   };
   
+  
+  // Delete modal state
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [internToDelete, setInternToDelete] = useState<AdminInternListItem | null>(null);
+  const [deletePending, startDeleteTransition] = useTransition();
+
+  const handleDeleteClick = (intern: AdminInternListItem) => {
+    setInternToDelete(intern);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (!internToDelete) return;
+    startDeleteTransition(async () => {
+      const res = await adminDeleteIntern(internToDelete.id);
+      if (res.error) {
+        toast.error(res.error);
+      } else {
+        toast.success('Candidate deleted permanently!');
+        setDeleteModalOpen(false);
+        setInternToDelete(null);
+        const updatedList = await adminGetInterns();
+        if (updatedList.interns) {
+          setInterns(updatedList.interns as AdminInternListItem[]);
+        }
+      }
+    });
+  };
+
   // Search & Filter state
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'pending_approval', 'declined', 'submitted'
@@ -199,12 +229,12 @@ export default function InternsListPage() {
 
         {/* Filters */}
         <div className="flex flex-wrap items-center gap-5">
-          <div className="flex items-center gap-2 text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+          <div className="flex items-center gap-2 text-xs font-semibold text-black dark:text-white uppercase tracking-wider">
             <span>Session:</span>
             <select
               value={selectedSessionId}
               onChange={(e) => handleSessionFilterChange(e.target.value)}
-              className="px-3 py-1.5 border border-neutral-200 dark:border-neutral-800 rounded-lg bg-white dark:bg-neutral-950 focus:outline-none text-neutral-700 dark:text-neutral-300 font-semibold cursor-pointer"
+              className="px-3 py-1.5 border border-neutral-200 dark:border-neutral-800 rounded-lg bg-white dark:bg-neutral-950 focus:outline-none text-black dark:text-white font-semibold cursor-pointer"
             >
               <option value="all">All Sessions</option>
               {sessions.map((session) => (
@@ -215,7 +245,7 @@ export default function InternsListPage() {
             </select>
           </div>
 
-          <label className="flex items-center gap-2 text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider cursor-pointer">
+          <label className="flex items-center gap-2 text-xs font-semibold text-black dark:text-white uppercase tracking-wider cursor-pointer">
             <input
               type="checkbox"
               checked={missingDocsOnly}
@@ -252,12 +282,13 @@ export default function InternsListPage() {
         <table className="w-full text-left text-sm border-collapse">
           <thead>
             <tr className="bg-neutral-50 dark:bg-neutral-900 border-b border-neutral-100 dark:border-neutral-800">
-              <th className="px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-neutral-400">Name</th>
-              <th className="px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-neutral-400">Status</th>
-              <th className="px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-neutral-400">Session</th>
-              <th className="px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-neutral-400">University &amp; Dept</th>
-              <th className="px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-neutral-400">Missing Documents</th>
-              <th className="px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-neutral-400 text-right">Actions</th>
+              <th className="w-10 px-4 py-3.5"></th>
+              <th className="px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-black dark:text-white">Name</th>
+              <th className="px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-black dark:text-white">Status</th>
+              <th className="px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-black dark:text-white">Session</th>
+              <th className="px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-black dark:text-white">University &amp; Dept</th>
+              <th className="px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-black dark:text-white">Missing Documents</th>
+              <th className="px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-black dark:text-white text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
@@ -267,6 +298,15 @@ export default function InternsListPage() {
                   key={intern.id}
                   className="hover:bg-neutral-50/50 dark:hover:bg-neutral-900/30 transition-colors"
                 >
+                  <td className="px-4 py-4 text-center">
+                    <button
+                      onClick={() => handleDeleteClick(intern)}
+                      className="text-rose-600 hover:text-rose-800 dark:text-rose-450 dark:hover:text-rose-300 p-1 cursor-pointer rounded hover:bg-rose-50 dark:hover:bg-rose-955/20 transition-colors"
+                      title="Delete Intern"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </td>
                   <td className="px-6 py-4">
                     <div className="flex flex-col">
                       <span className="font-semibold text-neutral-800 dark:text-neutral-250">{intern.name}</span>
@@ -355,7 +395,7 @@ export default function InternsListPage() {
               ))
             ) : (
               <tr>
-                <td colSpan={5} className="px-6 py-12 text-center text-neutral-400 italic">
+                <td colSpan={7} className="px-6 py-12 text-center text-neutral-400 italic">
                   No interns found matching the criteria.
                 </td>
               </tr>
@@ -431,6 +471,48 @@ export default function InternsListPage() {
           </div>
         )}
       </Card>
+
+      {/* Delete Confirmation Modal */}
+      {internToDelete && (
+        <Modal
+          isOpen={deleteModalOpen}
+          onClose={() => {
+            setDeleteModalOpen(false);
+            setInternToDelete(null);
+          }}
+          title="Confirm Permanent Deletion"
+        >
+          <div className="space-y-4 text-black dark:text-white">
+            <p className="text-sm">
+              Are you sure you want to permanently delete candidate <strong>{internToDelete.name}</strong> ({internToDelete.email})?
+            </p>
+            <p className="text-xs text-rose-600 dark:text-rose-400 font-semibold bg-rose-50 dark:bg-rose-950/20 p-2.5 rounded border border-rose-100 dark:border-rose-900/30">
+              Warning: This action will permanently remove all their profile details, requests, and uploaded files. They will no longer be able to log in (it will display &quot;Invalid email or password&quot;). This cannot be undone.
+            </p>
+
+            <div className="flex justify-end gap-2.5 pt-4 border-t border-neutral-100 dark:border-neutral-808/50 mt-6">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => {
+                  setDeleteModalOpen(false);
+                  setInternToDelete(null);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                onClick={handleDeleteConfirm}
+                isLoading={deletePending}
+                className="bg-rose-600 hover:bg-rose-700 text-white"
+              >
+                Permanently Delete
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }
