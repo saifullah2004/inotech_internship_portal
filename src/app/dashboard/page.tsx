@@ -174,6 +174,11 @@ export default function UserDashboard() {
       }
     });
 
+    const fullNameVal = formData.get('fullName') as string;
+    if (fullNameVal && !/^[a-zA-Z\s]+$/.test(fullNameVal)) {
+      errors.fullName = 'Full Name can only contain letters and spaces';
+    }
+
     const cgpaVal = parseFloat(formData.get('cgpa') as string);
     if (isNaN(cgpaVal) || cgpaVal < 0 || cgpaVal > 4.0) {
       errors.cgpa = 'CGPA must be a decimal between 0.0 and 4.0';

@@ -112,7 +112,11 @@ export default function InternDetailsPage({ params }: PageProps) {
     const startDate = formData.get('startDate') as string;
 
     const errors: Record<string, string> = {};
-    if (!fullName) errors.fullName = 'Required';
+    if (!fullName) {
+      errors.fullName = 'Required';
+    } else if (!/^[a-zA-Z\s]+$/.test(fullName)) {
+      errors.fullName = 'Full Name can only contain letters and spaces';
+    }
     if (!fatherName) errors.fatherName = 'Required';
     if (!phone) errors.phone = 'Required';
     if (!address) errors.address = 'Required';

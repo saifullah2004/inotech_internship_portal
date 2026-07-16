@@ -60,6 +60,11 @@ export default function AddInternManuallyPage() {
       }
     });
 
+    const fullName = formData.get('fullName') as string;
+    if (fullName && !/^[a-zA-Z\s]+$/.test(fullName)) {
+      validationErrors.fullName = 'Full Name can only contain letters and spaces';
+    }
+
     const email = formData.get('email') as string;
     if (email && !email.includes('@')) {
       validationErrors.email = 'Invalid email';
