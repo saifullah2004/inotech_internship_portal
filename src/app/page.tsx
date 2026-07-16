@@ -249,8 +249,9 @@ export default function RootPage() {
             </div>
           </div>
         </div>
-        <div className="max-w-7xl mx-auto flex justify-center items-center text-xs text-slate-450">
-          <span>&copy; 2020 Inotech Solutions (Pvt) Ltd. All rights reserved.</span>
+        <div className="max-w-7xl mx-auto flex flex-col justify-center items-center gap-1 text-xs text-slate-400">
+          <span>&copy; 2026 Inotech Solutions (Pvt) Ltd. All rights reserved.</span>
+          <span className="text-slate-500 italic mt-0.5">In the Supervision of Ma'am Samavia Rashool</span>
         </div>
       </footer>
     </div>
