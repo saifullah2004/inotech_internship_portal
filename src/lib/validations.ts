@@ -6,13 +6,22 @@ export const loginSchema = z.object({
 });
 
 export const registerSchema = z.object({
-  name: z.string().min(2, { message: 'Name must be at least 2 characters long' }),
+  name: z.string()
+    .min(2, { message: 'Name must be at least 2 characters long' })
+    .regex(/^[a-zA-Z\s]+$/, { message: 'Full Name can only contain letters and spaces' }),
   email: z.string().email({ message: 'Please enter a valid email address' }),
-  password: z.string().min(6, { message: 'Password must be at least 6 characters long' }),
+  password: z.string()
+    .min(8, { message: 'Password must be at least 8 characters long' })
+    .regex(/[A-Z]/, { message: 'Password must include at least one uppercase letter' })
+    .regex(/[a-z]/, { message: 'Password must include at least one lowercase letter' })
+    .regex(/[0-9]/, { message: 'Password must include at least one number (0-9)' })
+    .regex(/[!@&#]/, { message: 'Password must include at least one special character (!@&#)' }),
 });
 
 export const internDetailsSchema = z.object({
-  fullName: z.string().min(2, { message: 'Full Name is required' }),
+  fullName: z.string()
+    .min(2, { message: 'Full Name is required' })
+    .regex(/^[a-zA-Z\s]+$/, { message: 'Full Name can only contain letters and spaces' }),
   fatherName: z.string().min(2, { message: "Father's Name is required" }),
   email: z.string().email({ message: 'Valid email is required' }),
   phone: z.string().min(10, { message: 'Phone number must be at least 10 digits' }),

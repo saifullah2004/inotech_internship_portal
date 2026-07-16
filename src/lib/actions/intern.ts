@@ -604,6 +604,9 @@ export async function adminUpdateInternDetails(userId: number, formData: FormDat
 
     // Get text fields
     const fullName = formData.get('fullName') as string;
+    if (fullName && !/^[a-zA-Z\s]+$/.test(fullName)) {
+      return { error: 'Full Name can only contain letters and spaces' };
+    }
     const fatherName = formData.get('fatherName') as string;
     const phone = formData.get('phone') as string;
     const address = formData.get('address') as string;

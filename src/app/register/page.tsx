@@ -144,12 +144,24 @@ export default function RegisterPage() {
 
     // Client-side quick check
     const newErrors: Record<string, string> = {};
-    if (!name) newErrors.name = 'Full Name is required';
+    if (!name) {
+      newErrors.name = 'Full Name is required';
+    } else if (!/^[a-zA-Z\s]+$/.test(name)) {
+      newErrors.name = 'Full Name can only contain letters and spaces';
+    }
     if (!email) newErrors.email = 'Email is required';
     if (!password) {
       newErrors.password = 'Password is required';
-    } else if (password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+    } else if (password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters';
+    } else if (!/[A-Z]/.test(password)) {
+      newErrors.password = 'Password must include at least one uppercase letter';
+    } else if (!/[a-z]/.test(password)) {
+      newErrors.password = 'Password must include at least one lowercase letter';
+    } else if (!/[0-9]/.test(password)) {
+      newErrors.password = 'Password must include at least one number (0-9)';
+    } else if (!/[!@&#]/.test(password)) {
+      newErrors.password = 'Password must include at least one special character (!@&#)';
     }
     if (password !== confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
